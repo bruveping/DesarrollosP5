@@ -13,7 +13,8 @@ function setup() {
     setInterval (preguntaClima, 10000);
 }
 
-function preguntaClima (){    
+function preguntaClima (){   
+  //algo
     loadJSON('api.openweathermap.org/data/2.5/weather?q=Buenos+Aires&APPID=ef68648016d9f93a267a85b1c195a30d&units=metric', tengoElDato);
 }
 
