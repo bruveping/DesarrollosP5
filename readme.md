@@ -11,3 +11,7 @@ solo funciona con chrome
 pagina Clima Asunción
 https://bruveping.github.io/DesarrollosP5/paginaWebClimaC/
 solo funciona con chrome
+
+pagina Clima Asunción
+https://bruveping.github.io/DesarrollosP5/paginaWebClimaD/
+solo funciona con chrome
