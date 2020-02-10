@@ -12,4 +12,4 @@ https://bruveping.github.io/DesarrollosP5/paginaWebClimaD/
 funciona con chrome y mozilla
 
 Programa Simple de P5 para probar sliders y botones
-https://bruveping.github.io/DesarrollosP5/simpleConBinaryVerde/
+https://bruveping.github.io/DesarrollosP5/esliderYbotones/
