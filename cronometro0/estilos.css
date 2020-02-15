@@ -1,0 +1,51 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.contenedorFunciones {
+    text-align: center;
+    display:block;
+
+}
+
+.cuadradosAzules {
+    display: inline-block;
+    width: 25%;
+    height:40px;
+    font-size: 20px;
+    padding: 5px;
+    margin-top: 3px;
+    background: #00f;
+    color: #fff;
+}
+
+.cuadradosAzules:hover {
+    background: #58f;
+}
+
+#estaHora {
+    display: inline-block;
+    width: 80%;
+    font-size: 40px;
+    padding: 5px;
+    background: #000;
+    color: #fff;
+}
+.lasX{
+    display: inline-block;
+    width: 21%;
+    height:50px;
+    font-size: 40px;
+    padding: 5px;
+    background: #aaa;
+    color: #fff; 
+    margin-top: 3px;
+}
+
+#elimput {
+    display: inline-block;
+    width: 98%;
+    background: #ff0;
+    color: #f00;
+}
