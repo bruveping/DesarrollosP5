@@ -21,11 +21,23 @@ let laAlarma = new Audio('alarmaTimer.wav');
 lasLetras.addEventListener('keyup', (e) => {
 
     if(e.code == 'KeyA'){
-        elLapso = 60;        
+        elLapso = 60; 
+        A60.style.background = '#a0f';
+        A30.style.background = '#00f';
+        A24.style.background = '#00f';
+        laX.textContent = elLapso;
     }else if(e.code == 'KeyS'){
-        elLapso = 30;        
+        elLapso = 30;  
+        A60.style.background = '#00f';
+        A30.style.background = '#a0f';
+        A24.style.background = '#00f';
+        laX.textContent = elLapso;
     }else if(e.code == 'KeyD'){
-        elLapso = 24;        
+        elLapso = 24;   
+        A60.style.background = '#00f';
+        A30.style.background = '#00f';
+        A24.style.background = '#a0f';
+        laX.textContent = elLapso;
     }else if(e.code == 'KeyF'){
         enciende = !enciende; 
         enciendeApaga();
@@ -38,7 +50,8 @@ lasLetras.addEventListener('keyup', (e) => {
         for (let i = 0; i < porDondeVoy.length; i ++){
             porDondeVoy[i].style.background = '#aaa';
             y=0;
-        }      
+        }     
+        
     }
     //    if(e.code == 'KeyA'){
     //    console.log(e.code);
