@@ -128,6 +128,7 @@ A60.addEventListener('click', function(event){
     A60.style.background = '#a0f';
     A30.style.background = '#00f';
     A24.style.background = '#00f';
+    laX.textContent = elLapso;
 });
 A30.addEventListener('click', function(event){
     //    console.log('hola');
@@ -135,6 +136,7 @@ A30.addEventListener('click', function(event){
     A60.style.background = '#00f';
     A30.style.background = '#a0f';
     A24.style.background = '#00f';
+    laX.textContent = elLapso;
 });
 A24.addEventListener('click', function(event){
     //    console.log('hola');
@@ -142,6 +144,7 @@ A24.addEventListener('click', function(event){
     A60.style.background = '#00f';
     A30.style.background = '#00f';
     A24.style.background = '#a0f';
+    laX.textContent = elLapso;
 });
 Amas.addEventListener('click', function(event){
     //    console.log('hola');    
