@@ -6,7 +6,7 @@
 .contenedorFunciones {
     text-align: center;
     display:block;
-
+background: #555;
 }
 
 .cuadradosAzules {
@@ -51,7 +51,7 @@
 }
 
 .wrap{
-    width: 90%;
+    width: 100%;
     max-width: 1000px;
     background: #25ac;
     margin:auto;
@@ -60,7 +60,7 @@
 .widget{
     width: 85%;
     margin: auto;
-    background: #00dfd2;
+    background: #aaffff;
     /*margin: 2em;*/
     /*margin:32px;*/
     text-align: center;
