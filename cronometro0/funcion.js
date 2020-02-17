@@ -67,14 +67,58 @@ encendido.addEventListener('click', function(event){
 
 });
 
-function enciendeApaga (){
 
+
+var actualizarHora = function(){
+
+var fecha = new Date (),
+    horas = fecha.getHours(),
+    minutos = fecha.getMinutes(),
+    segundos = fecha.getSeconds(),
+    diaSemana = fecha.getDay(),
+    dia = fecha.getDate(),
+    mes = fecha.getUTCMonth(),
+    year = fecha.getFullYear();
+    
+    var pHoras = document.getElementById('horas'),
+        pMinutos = document.getElementById('minutos'),
+        pSegundos = document.getElementById('segundos'),
+        pDiaSemana = document.getElementById('diaSemana'),
+        pDia = document.getElementById('dia'),
+        pMes = document.getElementById('mes'),
+        pYear = document.getElementById('year');
+        
+    
+var semana =['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    
+    if(horas < 10){
+        horas = "0" + horas;
+    }
+        if(minutos < 10){
+        minutos = "0" + minutos;
+    }
+        if(segundos < 10){
+        segundos = "0" + segundos;
+    }
+
+pDiaSemana.textContent = semana[diaSemana];
+pDia.textContent = dia;
+pMes.textContent = meses[mes];
+pHoras.textContent = horas;
+pMinutos.textContent = minutos;
+pSegundos.textContent = segundos;
+pYear.textContent = year;
+    
+};
+
+function enciendeApaga (){
     if(enciende){
-        encendido.textContent = 'ON';
+        encendido.textContent = 'ON (f)';
         encendido.style.background = '#f00';
     }
     else{
-        encendido.textContent = 'OFF';
+        encendido.textContent = 'OFF (f)';
         encendido.style.background = '#00f';
     } 
 }
@@ -123,6 +167,7 @@ function updateValue(e) {
     A24.style.background = '#00f';
 }
 function todoLoquepasaAqui(){
+    actualizarHora();
     //    let elTiempo = new Date();
     //    let elSegundo = elTiempo.getSeconds() % 2;
     //    console.log(elSegundo);
@@ -142,4 +187,6 @@ function todoLoquepasaAqui(){
     }
     //let esto = console.log(x);
 }
+
+
 let valaCosa = setInterval(todoLoquepasaAqui, 1000);
