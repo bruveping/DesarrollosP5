@@ -1,0 +1,109 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.contenedorFunciones {
+    text-align: center;
+    display:block;
+background: #555;
+}
+
+.cuadradosAzules {
+    display: inline-block;
+    width: 25%;
+    height:40px;
+    font-size: 20px;
+    padding: 5px;
+    margin-top: 12px;
+    background: #00f;
+    color: #fff;
+}
+
+.cuadradosAzules:hover {
+    background: #58f;
+}
+
+.HorMinSeg{
+    width: 80%;
+    display:block;
+    z-index: -5;
+    background: #0ff;
+    font-size: .5em;
+    margin-top: 1px;
+}
+
+.HorMinSeg:hover{
+    background: #0aa;
+}
+#estaHora {
+    display: inline-block;
+    width: 80%;
+    font-size: 40px;
+    padding: 5px;
+    background: #000;
+    color: #fff;
+}
+.lasX{
+    display: inline-block;
+    width: 21%;
+    height:50px;
+    font-size: 40px;
+    padding: 5px;
+    background: #aaa;
+    color: #fff; 
+    margin-top: 3px;
+}
+
+#elimput {
+    display: inline-block;
+    width: 98%;
+    background: #ff0;
+    color: #f00;
+}
+
+.wrap{
+    width: 100%;
+    max-width: 1000px;
+    background: #25ac;
+    margin:auto;
+    text-align: center;
+}
+.widget{
+    width: 85%;
+    margin: auto;
+    background: #aaffff;
+    /*margin: 2em;*/
+    /*margin:32px;*/
+    text-align: center;
+}
+
+.widget p{
+    display: inline-block;
+    line-height: 1.5em;
+
+}
+
+.fecha {
+    display: inline-block;
+    font-family: Arial;
+    text-align: center;
+    font-size: 1.4em;
+    margin-bottom: 0.3125rem;
+    /*margin-bottom: 5px;*/
+    background: rgba(0,0,0,.2);
+    /*background: #000;*/
+    padding:4px;
+    width: 80%;
+}
+
+.reloj {
+    display: inline-block;
+    font-family: Arial;
+    width: 80%;
+    padding: 4px;
+    font-size: 2.2em;
+    text-align: center;
+    background: rgba(0,0,0,.2);
+    /*background: #000;*/
+}
