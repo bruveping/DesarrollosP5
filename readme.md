@@ -16,3 +16,5 @@ https://bruveping.github.io/DesarrollosP5/esliderYbotones/
 
 un Temporizador
 https://bruveping.github.io/DesarrollosP5/cronometro0/
+
+otro Temporizador https://bruveping.github.io/DesarrollosP5/cronometro01/
