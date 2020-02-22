@@ -1,4 +1,4 @@
-Este es im repositorio para mis desarrollos de P5
+Este es un repositorio para mis desarrollos de P5 y javascripts
 
 simpleConBinaryVerde
 https://bruveping.github.io/DesarrollosP5/simpleConBinaryVerde/
