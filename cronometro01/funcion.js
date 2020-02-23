@@ -16,6 +16,7 @@ let botonHor = document.getElementById('botonHor');
 /*Variables internas del programa*/
 let x = 0;
 let y = 0;
+let valorActual = 0;
 let pasatiempo = 0;
 let elLapso = 24;
 let elLapso01 = 1;
@@ -171,6 +172,11 @@ botonSeg.addEventListener('click', function(event){
     botonHor.style.background = '#0ff';
     botonMin.style.background = '#0ff';
     botonSeg.style.background = '#d40';
+    laX.textContent = valorActual * elLapso01;
+    elLapso = valorActual*elLapso01;
+    A60.style.background = '#00f';
+    A30.style.background = '#00f';
+    A24.style.background = '#00f'; 
 });
 botonMin.addEventListener('click', function(event){
     elLapso01=60;
@@ -178,6 +184,11 @@ botonMin.addEventListener('click', function(event){
     botonHor.style.background = '#0ff';
     botonMin.style.background = '#d40';
     botonSeg.style.background = '#0ff';
+    laX.textContent = valorActual * elLapso01;
+    elLapso = valorActual*elLapso01;
+    A60.style.background = '#00f';
+    A30.style.background = '#00f';
+    A24.style.background = '#00f'; 
 });
 botonHor.addEventListener('click', function(event){
     elLapso01=3600;
@@ -185,11 +196,14 @@ botonHor.addEventListener('click', function(event){
     botonHor.style.background = '#d40';
     botonMin.style.background = '#0ff';
     botonSeg.style.background = '#0ff';
+    laX.textContent = valorActual * elLapso01;
+    elLapso = valorActual*elLapso01;
+    A60.style.background = '#00f';
+    A30.style.background = '#00f';
+    A24.style.background = '#00f'; 
 });
 function updateValue(e) {
-    let valorActual;
     valorActual = e.srcElement.value;
-
     laX.textContent = valorActual * elLapso01;
     elLapso = valorActual*elLapso01;
     A60.style.background = '#00f';
