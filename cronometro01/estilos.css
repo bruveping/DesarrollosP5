@@ -6,7 +6,7 @@
 .contenedorFunciones {
     text-align: center;
     display:block;
-background: #555;
+    background: #555;
 }
 
 .cuadradosAzules {
@@ -15,27 +15,30 @@ background: #555;
     height:40px;
     font-size: 20px;
     padding: 5px;
-    margin-top: 12px;
+    margin-top: 0px;
     background: #00f;
     color: #fff;
+    margin-top: 10px;
 }
 
-.cuadradosAzules:hover {
-    background: #58f;
-}
 
 .HorMinSeg{
     width: 80%;
-    display:block;
-    z-index: -5;
+    display:inline;
     background: #0ff;
-    font-size: .5em;
-    margin-top: 1px;
+    font-size: .8em;
+
 }
 
 .HorMinSeg:hover{
     background: #0aa;
 }
+#Hms{
+
+    background: #aaa;
+
+}
+
 #estaHora {
     display: inline-block;
     width: 80%;
