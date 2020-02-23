@@ -18,3 +18,5 @@ un Temporizador
 https://bruveping.github.io/DesarrollosP5/cronometro0/
 
 otro Temporizador https://bruveping.github.io/DesarrollosP5/cronometro01/
+
+Random de palabras simple https://bruveping.github.io/DesarrollosP5/randomizaPalabraP5/
