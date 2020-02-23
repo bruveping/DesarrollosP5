@@ -10,7 +10,9 @@ let Amas = document.getElementById('aumenta');
 let Amenos = document.getElementById('disminuye');
 let laHora = document.getElementById('estaHora');
 let porDondeVoy = document.querySelectorAll('#PorDondeVoy> div');
-
+let botonSeg = document.getElementById('botonSeg');
+let botonMin = document.getElementById('botonMin');
+let botonHor = document.getElementById('botonHor');
 /*Variables internas del programa*/
 let x = 0;
 let y = 0;
@@ -22,20 +24,22 @@ let laAlarma = new Audio('alarmaTimer.wav');
 /*las condicionales*/
 let enciende = false;
 let laCondicional01 = false;
-
+let elBotonSeg = false;
+let elBotonMin = false;
+let elBotonHor = false;
 /*Funciones del programa*/
 
 /*Funciones del Reloj y la Fecha*/
 let actualizarHora = function(){
-let fecha = new Date (),
-    horas = fecha.getHours(),
-    minutos = fecha.getMinutes(),
-    segundos = fecha.getSeconds(),
-    diaSemana = fecha.getDay(),
-    dia = fecha.getDate(),
-    mes = fecha.getUTCMonth(),
-    year = fecha.getFullYear();
-    
+    let fecha = new Date (),
+        horas = fecha.getHours(),
+        minutos = fecha.getMinutes(),
+        segundos = fecha.getSeconds(),
+        diaSemana = fecha.getDay(),
+        dia = fecha.getDate(),
+        mes = fecha.getUTCMonth(),
+        year = fecha.getFullYear();
+
     let pHoras = document.getElementById('horas'),
         pMinutos = document.getElementById('minutos'),
         pSegundos = document.getElementById('segundos'),
@@ -43,29 +47,29 @@ let fecha = new Date (),
         pDia = document.getElementById('dia'),
         pMes = document.getElementById('mes'),
         pYear = document.getElementById('year');
-        
-    
-let semana =['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-let meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    
+
+
+    let semana =['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    let meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
     if(horas < 10){
         horas = "0" + horas;
     }
-        if(minutos < 10){
+    if(minutos < 10){
         minutos = "0" + minutos;
     }
-        if(segundos < 10){
+    if(segundos < 10){
         segundos = "0" + segundos;
     }
 
-pDiaSemana.textContent = semana[diaSemana];
-pDia.textContent = dia;
-pMes.textContent = meses[mes];
-pHoras.textContent = horas;
-pMinutos.textContent = minutos;
-pSegundos.textContent = segundos;
-pYear.textContent = year;
-    
+    pDiaSemana.textContent = semana[diaSemana];
+    pDia.textContent = dia;
+    pMes.textContent = meses[mes];
+    pHoras.textContent = horas;
+    pMinutos.textContent = minutos;
+    pSegundos.textContent = segundos;
+    pYear.textContent = year;
+
 };
 
 /*funciones del teclado*/
@@ -102,7 +106,7 @@ lasLetras.addEventListener('keyup', (e) => {
             porDondeVoy[i].style.background = '#aaa';
             y=0;
         }     
-        
+
     }
 }
                           );
@@ -125,6 +129,7 @@ function enciendeApaga (){
         encendido.style.background = '#00f';
     } 
 }
+/*aqui se agregan lapsos de tiempo*/
 A60.addEventListener('click', function(event){
     elLapso = 60;
     A60.style.background = '#a0f';
@@ -146,6 +151,7 @@ A24.addEventListener('click', function(event){
     A24.style.background = '#a0f';
     laX.textContent = elLapso;
 });
+/*se marca el momento en el cual esta el usuaro*/
 Amas.addEventListener('click', function(event){   
     let cualeslaY = y % porDondeVoy.length;
     porDondeVoy[cualeslaY].style.background = '#f00';
@@ -157,15 +163,38 @@ Amenos.addEventListener('click', function(event){
     }
     y = 0;
 });
-
+/*Aqui se ingresa un lapso personalizado*/
 elImput.addEventListener('input', updateValue);
+botonSeg.addEventListener('click', function(event){
+    elLapso01=1;
 
+    botonHor.style.background = '#0ff';
+    botonMin.style.background = '#0ff';
+    botonSeg.style.background = '#d40';
+});
+botonMin.addEventListener('click', function(event){
+    elLapso01=60;
+
+    botonHor.style.background = '#0ff';
+    botonMin.style.background = '#d40';
+    botonSeg.style.background = '#0ff';
+});
+botonHor.addEventListener('click', function(event){
+    elLapso01=3600;
+
+    botonHor.style.background = '#d40';
+    botonMin.style.background = '#0ff';
+    botonSeg.style.background = '#0ff';
+});
 function updateValue(e) {
-    laX.textContent = e.srcElement.value;
-    elLapso = e.srcElement.value;
+    let valorActual;
+    valorActual = e.srcElement.value;
+
+    laX.textContent = valorActual * elLapso01;
+    elLapso = valorActual*elLapso01;
     A60.style.background = '#00f';
     A30.style.background = '#00f';
-    A24.style.background = '#00f';
+    A24.style.background = '#00f'; 
 }
 function todoLoquepasaAqui(){
     actualizarHora();
