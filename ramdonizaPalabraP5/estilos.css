@@ -1,0 +1,22 @@
+body {
+    padding: 0; 
+    margin: 0;
+}
+
+#SuelteAqui {
+    border: 2px dashed #666;
+    font-size: 20pt;
+    height: 80px;
+    width: 50%;
+}
+
+
+#SuelteAqui:hover {
+    background: #aaa;
+}
+
+#creaDiv {
+    width: 90%;
+    background: #aaa
+    
+}
