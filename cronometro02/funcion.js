@@ -255,3 +255,7 @@ function todoLoquepasaAqui(){
 
 
 var valaCosa = setInterval(todoLoquepasaAqui, 1000);
+
+function primerSonido () {
+    laAlarma.play();
+}
