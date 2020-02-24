@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta charset="UTF-8">
+        <title>cronometro</title>
+        <link rel="stylesheet" href="estilos.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <div class="widget">
+                <div class="fecha">
+                    <p id="diaSemana" class="diaSemana"></p>
+                    <p id="dia" class="dia"></p>
+                    <p >de </p>
+                    <p id="mes" class="mes"></p>
+                    <p >del </p>
+                    <p id="year" class="year"></p>
+                </div>
+                <div class="reloj">
+                    <p id="horas" class="horas"></p>
+                    <p>:</p>
+                    <p id="minutos" class="minutos"></p>
+                    <p>:</p>
+                    <p id="segundos" class="segundos"></p>
+                </div>
+            </div>
+        </div>
+        <div id="contenedor">
+            <div class="contenedorFunciones" >
+                <div class="cuadradosAzules" id="a60">60 (a)</div>
+                <div class="cuadradosAzules" id="a30">30 (s)</div>
+                <div class="cuadradosAzules" id="a24">24 (d)</div>
+            </div>
+            <div class="contenedorFunciones" > 
+                <div class="cuadradosAzules" id="encendido">OFF (f)</div>
+                <div class="cuadradosAzules" id="aumenta">+ (g)</div>
+                <div class="cuadradosAzules" id="disminuye">- (h)</div>
+            </div>
+            <div class="contenedorFunciones" >
+
+                <div class="cuadradosAzules" id="x">X</div>
+                <div class="cuadradosAzules" id="">
+                    <input id="elimput" type="text"> 
+                </div>
+                <div class="cuadradosAzules" id="Hms">
+                    <div class="HorMinSeg" id="botonSeg">seg</div>
+                    <div class="HorMinSeg" id="botonMin">min</div>
+                    <div class="HorMinSeg" id="botonHor">hor</div>
+                </div>
+            </div>
+            <div class="contenedorFunciones" id = "laHora">
+                <div id="estaHora">0</div>
+            </div>
+            <div class="contenedorFunciones" id = "PorDondeVoy">
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>
+                <div class="lasX">x</div>            
+            </div>
+        </div>
+
+
+
+        <script src ="funcion.js"></script>
+    </body>
+</html>
