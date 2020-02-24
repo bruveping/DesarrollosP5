@@ -98,7 +98,9 @@ lasLetras.addEventListener('keyup', (e) => {
     }else if(e.code == 'KeyF'){
         enciende = !enciende; 
         enciendeApaga();
-        console.log(e.code);
+   if(enciende == false){
+       x = 0;
+   }
     }else if(e.code == 'KeyG'){
         let cualeslaY = y % porDondeVoy.length;
         porDondeVoy[cualeslaY].style.background = '#f00';
@@ -118,7 +120,9 @@ encendido.addEventListener('click', function(event){
     //    console.log('hola');
     enciende = !enciende;
     enciendeApaga();
-
+  if(enciende == false){
+       x = 0;
+   }
 });
 
 function enciendeApaga (){
@@ -181,7 +185,6 @@ botonSeg.addEventListener('click', function(event){
 });
 botonMin.addEventListener('click', function(event){
     elLapso01=60;
-
     botonHor.style.background = '#0ff';
     botonMin.style.background = '#d40';
     botonSeg.style.background = '#0ff';
@@ -193,7 +196,6 @@ botonMin.addEventListener('click', function(event){
 });
 botonHor.addEventListener('click', function(event){
     elLapso01=3600;
-
     botonHor.style.background = '#d40';
     botonMin.style.background = '#0ff';
     botonSeg.style.background = '#0ff';
@@ -216,9 +218,8 @@ function todoLoquepasaAqui(){
     if(enciende){
         x++; 
         let pasatiempo01 = x % elLapso;
-
         pasatiempo = Math.abs(elLapso -(x % elLapso));
-        elBotonSeg = pasatiempo % 60;
+        elBotonSeg = parseInt(pasatiempo % 60);
         elBotonMin = parseInt((pasatiempo / 60) % 60, 10);
         elBotonHor = parseInt(pasatiempo/3600, 10);
 
