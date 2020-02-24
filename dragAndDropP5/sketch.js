@@ -29,3 +29,7 @@ function recibeDocumento(file){
     }
 
 }
+
+function primerSonido () {
+    elAudio.play();
+}
