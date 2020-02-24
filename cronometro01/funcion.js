@@ -21,13 +21,14 @@ let pasatiempo = 0;
 let elLapso = 24;
 let elLapso01 = 1;
 let laAlarma = new Audio('alarmaTimer.wav');
+let elBotonSeg = 0;
+let elBotonMin = 0;
+let elBotonHor = 0;
 
 /*las condicionales*/
 let enciende = false;
 let laCondicional01 = false;
-let elBotonSeg = false;
-let elBotonMin = false;
-let elBotonHor = false;
+
 /*Funciones del programa*/
 
 /*Funciones del Reloj y la Fecha*/
@@ -213,10 +214,33 @@ function updateValue(e) {
 function todoLoquepasaAqui(){
     actualizarHora();
     if(enciende){
-        x++;    
-        pasatiempo = x % elLapso;
-        laHora.textContent = pasatiempo;  
-        if(pasatiempo == 0){
+        x++; 
+        let pasatiempo01 = x % elLapso;
+
+        pasatiempo = Math.abs(elLapso -(x % elLapso));
+        elBotonSeg = pasatiempo % 60;
+        elBotonMin = parseInt((pasatiempo / 60) % 60, 10);
+        elBotonHor = parseInt(pasatiempo/3600, 10);
+
+        laHora.textContent = elBotonHor+':'+elBotonMin+':'+elBotonSeg; 
+        if(elBotonSeg<10){
+            laHora.textContent = elBotonHor+':'+elBotonMin+':0'+elBotonSeg;  
+        }if(elBotonMin<10){
+            laHora.textContent = elBotonHor+':0'+elBotonMin+':'+elBotonSeg;  
+        }if(elBotonHor<10){
+            laHora.textContent = '0'+elBotonHor+':'+elBotonMin+':'+elBotonSeg;  
+        }if(elBotonHor<10&&elBotonMin<10){
+            laHora.textContent = '0'+elBotonHor+':0'+elBotonMin+':'+elBotonSeg;  
+        }if(elBotonHor<10&&elBotonSeg<10){
+            laHora.textContent = '0'+elBotonHor+':'+elBotonMin+':0'+elBotonSeg;  
+        }if(elBotonMin<10&&elBotonSeg<10){
+            laHora.textContent = elBotonHor+':0'+elBotonMin+':0'+elBotonSeg;  
+        }if(elBotonHor<10&&elBotonMin<10&&elBotonSeg<10){
+            laHora.textContent = '0'+elBotonHor+':0'+elBotonMin+':0'+elBotonSeg;  
+        }
+
+
+        if(pasatiempo01 == 0){
             laHora.style.background = '#f00';
             laAlarma.play();
         } else {
