@@ -207,8 +207,8 @@ botonHor.addEventListener('click', function(event){
 });
 function updateValue(e) {
     valorActual = e.srcElement.value;
-    laX.textContent = valorActual * elLapso01;
-    elLapso = valorActual*elLapso01;
+    laX.textContent = parseFloat(valorActual) * elLapso01;
+    elLapso = parseFloat(valorActual)*elLapso01;
     A60.style.background = '#00f';
     A30.style.background = '#00f';
     A24.style.background = '#00f'; 
