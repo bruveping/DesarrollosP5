@@ -177,8 +177,8 @@ botonSeg.addEventListener('click', function(event){
     botonHor.style.background = '#0ff';
     botonMin.style.background = '#0ff';
     botonSeg.style.background = '#d40';
-    laX.textContent = valorActual * elLapso01;
-    elLapso = valorActual*elLapso01;
+    laX.textContent = parseFloat(valorActual) * elLapso01;
+    elLapso = parseFloat(valorActual)*elLapso01;
     A60.style.background = '#00f';
     A30.style.background = '#00f';
     A24.style.background = '#00f'; 
@@ -188,8 +188,8 @@ botonMin.addEventListener('click', function(event){
     botonHor.style.background = '#0ff';
     botonMin.style.background = '#d40';
     botonSeg.style.background = '#0ff';
-    laX.textContent = valorActual * elLapso01;
-    elLapso = valorActual*elLapso01;
+    laX.textContent = parseFloat(valorActual) * elLapso01;
+    elLapso = parseFloat(valorActual)*elLapso01;
     A60.style.background = '#00f';
     A30.style.background = '#00f';
     A24.style.background = '#00f'; 
@@ -199,8 +199,8 @@ botonHor.addEventListener('click', function(event){
     botonHor.style.background = '#d40';
     botonMin.style.background = '#0ff';
     botonSeg.style.background = '#0ff';
-    laX.textContent = valorActual * elLapso01;
-    elLapso = valorActual*elLapso01;
+    laX.textContent = parseFloat(valorActual) * elLapso01;
+    elLapso = parseFloat(valorActual)*elLapso01;
     A60.style.background = '#00f';
     A30.style.background = '#00f';
     A24.style.background = '#00f'; 
