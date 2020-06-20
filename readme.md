@@ -21,4 +21,7 @@ otro Temporizador https://bruveping.github.io/DesarrollosP5/cronometro01/
 
 Random de palabras simple https://bruveping.github.io/DesarrollosP5/randomizaPalabraP5/
 
+Random de numeros, pensado para musica aleatoria https://bruveping.github.io/DesarrollosP5/paginaWebRandomNum/
+
+
 Un monocromo de arte https://bruveping.github.io/DesarrollosP5/paginaNegra/
