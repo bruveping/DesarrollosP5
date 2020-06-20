@@ -1,0 +1,22 @@
+*{
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    background: #050505;
+        font-family: Arial;
+    text-align: center;
+}
+
+
+div{
+        font-size: 1em;
+    color: #fff;
+    background: #000;
+    display: block;
+    padding: 20px;
+    margin: 20px;
+}
+
+#elResultado{
+  text-align: left;  
+}
