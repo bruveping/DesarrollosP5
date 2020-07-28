@@ -6,7 +6,7 @@ function setup() {
     // put setup code here
         createElement('h1',"Tono Saturación Valor");
     createElement('h2',"Pagina Web para explorar HSB");
-    createCanvas(400,400);
+    createCanvas(800,200);
     background(0);
     createP("Tono");
     sliderTono = createSlider(0,360,0);
