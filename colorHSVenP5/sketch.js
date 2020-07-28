@@ -12,7 +12,7 @@ function setup() {
     elTitulo.addClass('estaClase');
     elSubTitu =  createElement('h2',"Pagina Web para explorar HSB");
     elSubTitu.addClass('estaClase');
-    laTela = createCanvas(400,400);
+    laTela = createCanvas(800,200);
     laTela.addClass('estaClase');
     background(0);
     createP("Tono").addClass('estaClase');;
