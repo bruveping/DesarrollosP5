@@ -21,6 +21,8 @@ otro Temporizador https://bruveping.github.io/DesarrollosP5/cronometro01/
 
 Random de palabras simple https://bruveping.github.io/DesarrollosP5/randomizaPalabraP5/
 
+Experimentar con la teoría del color HSB https://bruveping.github.io/DesarrollosP5/colorHSVenP5/
+
 Random de numeros, pensado para musica aleatoria https://bruveping.github.io/DesarrollosP5/paginaWebRandomNum/
 
 
