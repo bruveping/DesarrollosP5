@@ -25,5 +25,6 @@ Experimentar con la teoría del color HSB https://bruveping.github.io/Desarrollo
 
 Random de numeros, pensado para musica aleatoria https://bruveping.github.io/DesarrollosP5/paginaWebRandomNum/
 
-
 Un monocromo de arte https://bruveping.github.io/DesarrollosP5/paginaNegra/
+
+Otro monocromo de arte https://bruveping.github.io/DesarrollosP5/autoMonocromo/
