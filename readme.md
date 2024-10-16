@@ -28,3 +28,5 @@ Random de numeros, pensado para musica aleatoria https://bruveping.github.io/Des
 Un monocromo de arte https://bruveping.github.io/DesarrollosP5/paginaNegra/
 
 Otro monocromo de arte https://bruveping.github.io/DesarrollosP5/autoMonocromo/
+
+mueve texto en red https://bruveping.github.io/DesarrollosP5/mueveElTextoREd_2024_10_16/
