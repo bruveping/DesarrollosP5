@@ -30,3 +30,7 @@ Un monocromo de arte https://bruveping.github.io/DesarrollosP5/paginaNegra/
 Otro monocromo de arte https://bruveping.github.io/DesarrollosP5/autoMonocromo/
 
 mueve texto en red https://bruveping.github.io/DesarrollosP5/mueveElTextoREd_2024_10_16/
+
+mueve texto en red 2 https://bruveping.github.io/DesarrollosP5/mueveElTextojs2024/
+
+
