@@ -33,4 +33,6 @@ mueve texto en red https://bruveping.github.io/DesarrollosP5/mueveElTextoREd_202
 
 mueve texto en red 2 https://bruveping.github.io/DesarrollosP5/mueveElTextojs2024/
 
+redacta informe académico https://bruveping.github.io/DesarrollosP5/redactarInformeAcade/
+
 
