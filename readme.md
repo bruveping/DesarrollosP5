@@ -37,6 +37,8 @@ redacta informe académico https://bruveping.github.io/DesarrollosP5/redactarInf
 
 redacta informe académico https://bruveping.github.io/DesarrollosP5/contarPalabras/
 
+Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssDisplay
+
 
 
 
