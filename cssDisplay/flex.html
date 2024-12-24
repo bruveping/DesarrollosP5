@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Display Flex</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            background-color: lightgreen;
+            padding: 10px;
+        }
+
+        .flex-item {
+            width: 25%;
+            height: 30%;
+
+            background-color: lightgrey;
+            padding: 20px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ejemplo de Display: Flex</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>El valor <code>flex</code> para la propiedad <code>display</code> convierte un contenedor en un contenedor
+            flexible (flex container) y sus elementos hijos en elementos flexibles
+            (flex items). Esto permite una alineación y distribución eficientes de espacio entre los elementos
+            dentro del contenedor. Es útil para crear diseños adaptables y responsivos.
+        Estos elementos son importantes y van en el contenedor<code>
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+        </code>        
+        </p>
+
+        <h2>Ejemplo</h2>
+        <div class="flex-container">
+            <div class="flex-item">
+                Elemento 1
+            </div>
+            <div class="flex-item">
+                Elemento 2
+            </div>
+            <div class="flex-item">
+                Elemento 3
+            </div>
+            <div class="flex-item">
+                Elemento 4
+            </div>
+            <div class="flex-item">
+                Elemento 5
+            </div>
+            <div class="flex-item">
+                Elemento 6
+            </div>
+            <div class="flex-item">
+                Elemento 7
+            </div>
+            <div class="flex-item">
+                Elemento 8
+            </div>
+            <div class="flex-item">
+                Elemento 9
+            </div>
+        </div>
+        <div class="flex-container" style="display: flex; background-color: lightgreen; padding: 10px;">
+        </div>
+</body>
+
+</html>

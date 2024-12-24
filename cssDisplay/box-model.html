@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Box Model</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .box {
+            width: 200px;
+            height: 100px;
+            margin: 20px;
+            padding: 10px;
+            border: 5px solid blue; /* Color del borde */
+            background-color: lightblue;
+        }
+        .box-content {
+            background-color: lightgrey;
+            padding: 10px;
+        }
+        .content-color {
+            color: grey; /* Color del contenido */
+        }
+        .padding-color {
+            color: lightblue; /* Color del padding */
+        }
+        .border-color {
+            color: blue; /* Color del borde */
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo del Modelo de Caja (Box Model)</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>El <em>modelo de caja</em> (o <em>box model</em>) en CSS es un concepto que describe cómo se disponen los elementos en la página. Cada elemento se representa como una caja rectangular con cuatro áreas: el contenido (<span class="content-color">content</span>), el relleno (<code class="padding-color">padding</code>), el borde (<span class="border-color">border</span>) y el margen (<code>margin</code>).</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="box">
+            <div class="box-content">Contenido de la caja</div>
+        </div>
+    </div>
+</body>
+</html>

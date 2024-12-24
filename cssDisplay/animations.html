@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Animations</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        @keyframes example {
+            from {background-color: red; width: 30px;}
+            to {background-color: yellow; width: 500px;}
+        }
+        .animated-box {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            animation-name: example;
+            animation-duration: 7s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Animaciones en CSS</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>Las <em>animaciones</em> en CSS permiten cambiar gradualmente un estilo de un elemento desde un estado inicial a uno final. Utilizando la propiedad <code>@keyframes</code>, puedes definir el comportamiento de la animación, y las propiedades <code>animation-name</code> y <code>animation-duration</code> controlan qué animación se aplica y su duración.</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="animated-box"></div>
+    </div>
+</body>
+</html>

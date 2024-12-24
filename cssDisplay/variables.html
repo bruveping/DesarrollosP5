@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Variables</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        :root {
+            --main-bg-color: lightcoral;
+            --main-text-color: white;
+            --secondary-bg-color: lightgrey;
+            --secondary-text-color: black;
+        }
+        .variables-container {
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            padding: 20px;
+        }
+        .variables-item {
+            background-color: var(--secondary-bg-color);
+            color: var(--secondary-text-color);
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Variables en CSS</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>Las <em>variables</em> en CSS, también conocidas como <em>custom properties</em>, permiten definir valores reutilizables que pueden aplicarse en múltiples partes de un documento CSS. Utilizando <code>:root</code>, puedes declarar variables globales y emplear la función <code>var()</code> para utilizarlas en tu hoja de estilo, facilitando la gestión y modificación de estilos.</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="variables-container">
+            <div class="variables-item">Elemento 1</div>
+            <div class="variables-item">Elemento 2</div>
+            <div class="variables-item">Elemento 3</div>
+        </div>
+    </div>
+</body>
+</html>

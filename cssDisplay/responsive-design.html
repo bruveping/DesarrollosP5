@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Responsive Design</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .responsive-container {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: lightblue;
+            padding: 10px;
+        }
+
+        .responsive-item {
+            background-color: lightgrey;
+            padding: 20px;
+            margin: 5px;
+            flex: 1 1 200px;
+            /* Flex item grows and shrinks to fit */
+        }
+
+        @media (max-width: 600px) {
+            .responsive-item {
+                flex: 1 1 100%;
+                /* Flex item takes full width on small screens */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ejemplo de Diseño Responsivo</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>El <em>diseño responsivo</em> en CSS se refiere a la capacidad de un sitio web para adaptarse a diferentes
+            tamaños de pantalla y dispositivos. Utilizando <code>media queries</code> y propiedades como
+            <code>flex</code> y <code>grid</code>, puedes crear diseños que se ajusten fluidamente, mejorando la
+            experiencia del usuario en dispositivos móviles y de escritorio. En este caso, si se modifica el tamaño de la ventana, se modifica el diseño</p>
+
+        <h2>Ejemplo</h2>
+        <div class="responsive-container">
+            <div class="responsive-item">Elemento 1</div>
+            <div class="responsive-item">Elemento 2</div>
+            <div class="responsive-item">Elemento 3</div>
+            <div class="responsive-item">Elemento 4</div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Grid</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto;
+            background-color: lightyellow;
+            padding: 10px;
+        }
+        .grid-item {
+            background-color: lightgrey;
+            padding: 20px;
+            margin: 5px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Display: Grid</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>El valor <code>grid</code> para la propiedad <code>display</code> convierte 
+            un contenedor en un contenedor de cuadrícula (grid container) y sus elementos hijos en elementos de cuadrícula (grid items). 
+            Esto permite una disposición bidimensional de los elementos, proporcionando una gran flexibilidad y control sobre la alineación 
+            y distribución del espacio dentro del contenedor. Cuantos más autos tiene mayor cantidad de columnas<code>grid-template-columns: auto auto auto auto auto;</code>
+        en este caso va a tener 5 columnas</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="grid-container">
+            <div class="grid-item">Elemento 1</div>
+            <div class="grid-item">Elemento 2</div>
+            <div class="grid-item">Elemento 3</div>
+            <div class="grid-item">Elemento 4</div>
+            <div class="grid-item">Elemento 5</div>
+            <div class="grid-item">Elemento 6</div>
+            <div class="grid-item">Elemento 7</div>
+            <div class="grid-item">Elemento 8</div>
+            <div class="grid-item">Elemento 9</div>
+            <div class="grid-item">Elemento 10</div>
+            <div class="grid-item">Elemento 11</div>
+            <div class="grid-item">Elemento 12</div>
+        </div>
+    </div>
+</body>
+</html>

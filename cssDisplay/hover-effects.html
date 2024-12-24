@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hover Effects</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .hover-box {
+            width: 100px;
+            height: 100px;
+            background-color: lightcoral;
+            margin: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .hover-box:hover {
+            background-color: lightblue;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Efectos Hover en CSS</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>Los <em>efectos hover</em> en CSS permiten cambiar el estilo de un elemento cuando el cursor se coloca sobre él. Utilizando la pseudo-clase <code>:hover</code>, puedes crear efectos visuales que mejoran la interactividad del sitio web. Combinando <code>:hover</code> con propiedades como <code>transition</code>, puedes lograr efectos suaves y atractivos.</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="hover-box"></div>
+    </div>
+</body>
+</html>

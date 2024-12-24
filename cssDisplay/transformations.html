@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Transformations</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .transform-box {
+            width: 100px;
+            height: 100px;
+            background-color: lightgreen;
+            margin: 20px;
+            transition: transform 0.5s;
+        }
+        .transform-box:hover {
+            transform: rotate(45deg) scale(1.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Transformaciones en CSS</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>Las <em>transformaciones</em> en CSS permiten modificar el espacio de un elemento utilizando la propiedad <code>transform</code>. Con transformaciones, puedes rotar (<code>rotate</code>), escalar (<code>scale</code>), trasladar (<code>translate</code>) y sesgar (<code>skew</code>) elementos, creando efectos visuales interesantes y dinámicos. Utilizando la propiedad <code>transition</code>, puedes animar estos cambios de manera suave.</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="transform-box"></div>
+    </div>
+</body>
+</html>

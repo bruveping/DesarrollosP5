@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Table</title>
+    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <style>
+        .table-container {
+            display: table;
+            background-color: lightblue;
+            width: 100%;
+        }
+        .table-row {
+            display: table-row;
+        }
+        .table-cell {
+            display: table-cell;
+            background-color: lightgrey;
+            padding: 20px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ejemplo de Display: Table</h1>
+    <div class="container">
+        <h2>Descripción</h2>
+        <p>El valor <code>table</code> para la propiedad <code>display</code> convierte un contenedor en un contenedor de tabla y sus elementos hijos en elementos de tabla. Esto es útil para crear diseños similares a una tabla sin usar elementos <code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code> o <code>&lt;td&gt;</code>. Permite una estructura más semántica y controlada de los elementos.</p>
+        
+        <h2>Ejemplo</h2>
+        <div class="table-container">
+            <div class="table-row">
+                <div class="table-cell">Elemento 1</div>
+                <div class="table-cell">Elemento 2</div>
+                <div class="table-cell">Elemento 3</div>
+            </div>
+            <div class="table-row">
+                <div class="table-cell">Elemento 4</div>
+                <div class="table-cell">Elemento 5</div>
+                <div class="table-cell">Elemento 6</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
