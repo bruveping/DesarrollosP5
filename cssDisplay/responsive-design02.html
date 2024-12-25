@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño Responsivo en CSS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .responsive-container {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: lightblue;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .responsive-item {
+            background-color: lightgrey;
+            padding: 20px;
+            margin: 5px;
+            flex: 1 1 200px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .responsive-item {
+                flex: 1 1 100%; /* Los elementos ocupan todo el ancho en pantallas pequeñas */
+            }
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Diseño Responsivo en CSS</h1>
+
+        <h2>¿Qué es el Diseño Responsivo?</h2>
+        <p>El <strong>diseño responsivo</strong> permite que un sitio web se adapte fluidamente a diferentes tamaños de pantalla y dispositivos. Esto mejora la experiencia del usuario al asegurar que el contenido sea legible y accesible en cualquier entorno.</p>
+
+        <h2>Herramientas Clave del Diseño Responsivo</h2>
+        <ul>
+            <li><code>flex-wrap</code>: Permite que los elementos se envuelvan en una nueva línea si el espacio es insuficiente.</li>
+            <li><code>media queries</code>: Aplican estilos condicionales basados en el tamaño de la pantalla.</li>
+            <li><code>flex</code>: Controla cómo los elementos flexibles crecen, se reducen o se dimensionan.</li>
+        </ul>
+
+        <h2>Ejemplo Práctico</h2>
+        <div class="responsive-container">
+            <div class="responsive-item">Elemento 1</div>
+            <div class="responsive-item">Elemento 2</div>
+            <div class="responsive-item">Elemento 3</div>
+            <div class="responsive-item">Elemento 4</div>
+        </div>
+
+        <h2>Media Queries</h2>
+        <p>Un ejemplo de <code>media queries</code> que ajusta el diseño para pantallas pequeñas:</p>
+        <pre><code>/* Pantallas con ancho máximo de 600px */
+@media (max-width: 600px) {
+    .responsive-item {
+        flex: 1 1 100%;
+    }
+}</code></pre>
+
+        <h2>Ventajas del Diseño Responsivo</h2>
+        <ul>
+            <li>Optimización para móviles, tabletas y desktops.</li>
+            <li>Mejor experiencia de usuario en dispositivos modernos.</li>
+            <li>Fácil mantenimiento de un solo diseño adaptable.</li>
+        </ul>
+
+        <h2>Prueba el Diseño</h2>
+        <p>Redimensiona la ventana de tu navegador para observar cómo los elementos se ajustan automáticamente al espacio disponible.</p>
+    </div>
+</body>
+
+</html>

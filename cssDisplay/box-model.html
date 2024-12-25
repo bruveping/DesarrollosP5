@@ -1,50 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Box Model</title>
-    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Caja (Box Model)</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .box {
             width: 200px;
             height: 100px;
             margin: 20px;
             padding: 10px;
-            border: 5px solid blue; /* Color del borde */
+            border: 5px solid blue;
             background-color: lightblue;
+            position: relative;
         }
+
         .box-content {
             background-color: lightgrey;
             padding: 10px;
+            text-align: center;
+            font-weight: bold;
         }
-        .content-color {
-            color: grey; /* Color del contenido */
-        }
-        .padding-color {
-            color: lightblue; /* Color del padding */
-        }
-        .border-color {
-            color: blue; /* Color del borde */
-        }
-        #elModeloDeCaja {
-width: 40%;
 
+        .legend {
+            margin-top: 20px;
+        }
+
+        .legend span {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .legend .content-color {
+            background-color: lightgrey;
+        }
+
+        .legend .padding-color {
+            background-color: lightblue;
+        }
+
+        .legend .border-color {
+            background-color: blue;
+        }
+
+        .legend .margin-color {
+            background-color: lightcoral;
+        }
+
+        #elModeloDeCaja {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        .example {
+            margin-top: 30px;
+        }
+
+        .example .example-box {
+            margin: 10px;
+            padding: 15px;
+            border: 3px solid green;
+            background-color: lightyellow;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
         }
     </style>
 </head>
 <body>
-    <h1>Ejemplo del Modelo de Caja (Box Model)</h1>
     <div class="container">
-        <h2>Descripción</h2>
-        <p>El <em>modelo de caja</em> (o <em>box model</em>) en CSS es un concepto que describe cómo se disponen los elementos en la página. Cada elemento se representa como una caja rectangular con cuatro áreas: el contenido (<span class="content-color">content</span>), el relleno (<code class="padding-color">padding</code>), el borde (<span class="border-color">border</span>) y el margen (<code>margin</code>).</p>
-        
-        <h2>Ejemplo</h2>
+        <h1>Modelo de Caja (Box Model)</h1>
+
+        <h2>¿Qué es el Modelo de Caja?</h2>
+        <p>El <strong>modelo de caja</strong> en CSS describe cómo se representa cada elemento como una caja rectangular que consta de las siguientes partes:</p>
+        <ul>
+            <li><strong>Contenido</strong>: El área donde se encuentra el texto o los elementos hijos.</li>
+            <li><strong>Padding</strong>: Espacio entre el contenido y el borde.</li>
+            <li><strong>Borde</strong>: El contorno que envuelve el padding y el contenido.</li>
+            <li><strong>Margen</strong>: Espacio entre el borde de una caja y otras cajas.</li>
+        </ul>
+
+        <h2>Ejemplo Visual</h2>
         <div class="box">
             <div class="box-content">Contenido de la caja</div>
         </div>
+
         <div>
-            <p>Imagen del modelo del border box</p>
-            <img id="elModeloDeCaja" src="imagen/modelo de caja Box Model.JPG" alt="modelo de caja">
+            <p>Imagen explicativa del modelo de caja:</p>
+            <img id="elModeloDeCaja" src="imagen/modelo de caja Box Model.JPG" alt="Modelo de caja">
         </div>
+
+        <h2>Colores Representativos</h2>
+        <div class="legend">
+            <span class="content-color">Contenido</span>
+            <span class="padding-color">Padding</span>
+            <span class="border-color">Borde</span>
+            <span class="margin-color">Margen</span>
+        </div>
+
+        <h2>Ejemplo Práctico</h2>
+        <div class="example">
+            <div class="example-box">
+                <p>Este es un ejemplo de cómo el modelo de caja afecta la disposición de los elementos.</p>
+                <ul>
+                    <li>El <code>padding</code> agrega espacio interno.</li>
+                    <li>El <code>margin</code> separa esta caja de otras.</li>
+                    <li>El <code>border</code> es visible como un contorno.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Propiedades CSS Relacionadas</h2>
+        <p>Algunas propiedades CSS comunes usadas para manipular el modelo de caja:</p>
+        <ul>
+            <li><code>width</code> y <code>height</code>: Definen el tamaño del contenido.</li>
+            <li><code>padding</code>: Controla el espacio interno de la caja.</li>
+            <li><code>border</code>: Configura el tamaño y estilo del borde.</li>
+            <li><code>margin</code>: Controla el espacio externo de la caja.</li>
+            <li><code>box-sizing</code>: Define cómo se calculan <code>width</code> y <code>height</code> (por ejemplo, <code>content-box</code> o <code>border-box</code>).</li>
+        </ul>
+
+        <h2>Propiedad box-sizing</h2>
+        <p>Por defecto, CSS utiliza <code>content-box</code>, lo que significa que el tamaño de <code>width</code> y <code>height</code> excluye <code>padding</code> y <code>border</code>. Usar <code>box-sizing: border-box</code> asegura que el tamaño total incluya estos valores.</p>
+        <pre><code>/* Ejemplo de uso */
+.box {
+    box-sizing: border-box;
+}</code></pre>
     </div>
 </body>
 </html>
+

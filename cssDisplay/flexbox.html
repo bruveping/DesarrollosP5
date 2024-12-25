@@ -1,35 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Flexbox</title>
-    <link rel="stylesheet" type="text/css" href="estilo.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox en CSS</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .flex-container {
-            height: 400PX;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
             background-color: lightgreen;
             padding: 10px;
+            gap: 10px;
         }
+
         .flex-item {
-            width: 50%;
+            flex: 1 1 calc(30% - 10px); /* Tamaño flexible */
             background-color: lightgrey;
             padding: 20px;
             margin: 5px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
         }
     </style>
 </head>
 <body>
-    <h1>Ejemplo de Flexbox</h1>
     <div class="container">
-        <h2>Descripción</h2>
-        <p>El <em>modelo de caja flexible</em> (o <em>flexbox</em>) en CSS es un método de diseño que permite distribuir el espacio de manera eficiente entre los elementos de un contenedor flexible, incluso cuando su tamaño es desconocido o dinámico. Flexbox es ideal para aplicaciones de diseño de una sola dimensión.</p>
-        
-        <h2>Ejemplo</h2>
+        <h1>Flexbox en CSS</h1>
+
+        <h2>¿Qué es Flexbox?</h2>
+        <p>El modelo <strong>flexbox</strong> (caja flexible) es un método de diseño en CSS que organiza elementos dentro de un contenedor. Este modelo permite una distribución eficiente del espacio y alineación, ideal para interfaces modernas.</p>
+
+        <h2>Propiedades del Contenedor Flex</h2>
+        <ul>
+            <li><code>display: flex;</code>: Define un contenedor flexible.</li>
+            <li><code>justify-content</code>: Alinea los elementos horizontalmente.
+                <ul>
+                    <li><code>flex-start</code>: Elementos alineados al inicio.</li>
+                    <li><code>center</code>: Elementos centrados.</li>
+                    <li><code>space-between</code>: Espacio uniforme entre elementos.</li>
+                </ul>
+            </li>
+            <li><code>align-items</code>: Alinea los elementos verticalmente.
+                <ul>
+                    <li><code>flex-start</code>: Elementos alineados en la parte superior.</li>
+                    <li><code>center</code>: Elementos alineados al centro vertical.</li>
+                </ul>
+            </li>
+            <li><code>flex-wrap</code>: Permite que los elementos se envuelvan en varias líneas.</li>
+        </ul>
+
+        <h2>Ejemplo Práctico</h2>
         <div class="flex-container">
             <div class="flex-item">Elemento 1</div>
             <div class="flex-item">Elemento 2</div>
             <div class="flex-item">Elemento 3</div>
+            <div class="flex-item">Elemento 4</div>
+            <div class="flex-item">Elemento 5</div>
         </div>
+
+        <h2>Propiedades de los Elementos Flexibles</h2>
+        <ul>
+            <li><code>flex-grow</code>: Define cuánto puede crecer un elemento respecto a los demás.</li>
+            <li><code>flex-shrink</code>: Define cuánto puede reducirse un elemento respecto a los demás.</li>
+            <li><code>flex-basis</code>: Establece el tamaño base de un elemento antes de aplicar <code>flex-grow</code> o <code>flex-shrink</code>.</li>
+            <li><code>order</code>: Cambia el orden visual de los elementos flexibles.</li>
+        </ul>
+
+        <h2>Configuración Avanzada</h2>
+        <p>El siguiente ejemplo muestra cómo manipular propiedades de los elementos flexibles:</p>
+        <pre><code>/* Configuración avanzada de Flexbox */
+.flex-item {
+    flex: 2 1 200px; /* flex-grow, flex-shrink, flex-basis */
+    order: 1;       /* Elemento se mostrará al final */
+}</code></pre>
     </div>
 </body>
 </html>
+

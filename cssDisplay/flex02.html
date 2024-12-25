@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Características y Ejemplos de Flexbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background-color: lightgreen;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .flex-item {
+            flex: 1 1 calc(25% - 20px);
+            background-color: lightgrey;
+            padding: 20px;
+            margin: 5px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .flex-item {
+                flex: 1 1 100%;
+            }
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Guía Completa de Flexbox</h1>
+
+        <h2>¿Qué es Flexbox?</h2>
+        <p>Flexbox es un modelo de diseño en CSS que proporciona una forma eficiente de alinear y distribuir espacio entre elementos dentro de un contenedor. Esto es especialmente útil cuando el tamaño de los elementos es dinámico o desconocido.</p>
+
+        <h2>Propiedades del Contenedor Flexible</h2>
+        <ul>
+            <li><code>display: flex;</code>: Define un contenedor flexible.</li>
+            <li><code>flex-direction</code>: Establece la dirección principal (fila o columna). Ejemplo:
+                <pre><code>flex-direction: row | row-reverse | column | column-reverse;</code></pre>
+            </li>
+            <li><code>flex-wrap</code>: Controla si los elementos deben ajustarse a una nueva línea. Ejemplo:
+                <pre><code>flex-wrap: nowrap | wrap | wrap-reverse;</code></pre>
+            </li>
+            <li><code>justify-content</code>: Alinea los elementos a lo largo de la dirección principal. Ejemplo:
+                <pre><code>justify-content: flex-start | flex-end | center | space-between | space-around | space-evenly;</code></pre>
+            </li>
+            <li><code>align-items</code>: Alinea los elementos a lo largo del eje transversal. Ejemplo:
+                <pre><code>align-items: flex-start | flex-end | center | baseline | stretch;</code></pre>
+            </li>
+            <li><code>align-content</code>: Alinea las líneas de un contenedor con múltiples líneas. Ejemplo:
+                <pre><code>align-content: flex-start | flex-end | center | space-between | space-around | stretch;</code></pre>
+            </li>
+        </ul>
+
+        <h2>Ejemplo 1: Dirección y Envoltura</h2>
+        <div class="flex-container" style="flex-direction: row; flex-wrap: wrap;">
+            <div class="flex-item">Elemento 1</div>
+            <div class="flex-item">Elemento 2</div>
+            <div class="flex-item">Elemento 3</div>
+            <div class="flex-item">Elemento 4</div>
+            <div class="flex-item">Elemento 5</div>
+            <div class="flex-item">Elemento 6</div>
+        </div>
+
+        <h2>Ejemplo 2: Justificación y Alineación</h2>
+        <div class="flex-container" style="justify-content: space-around; align-items: center;">
+            <div class="flex-item">Elemento A</div>
+            <div class="flex-item">Elemento B</div>
+            <div class="flex-item">Elemento C</div>
+        </div>
+
+        <h2>Propiedades de los Elementos Flexibles</h2>
+        <ul>
+            <li><code>flex</code>: Define cómo un elemento crece, se reduce o se ajusta. Ejemplo:
+                <pre><code>flex: grow shrink basis;</code></pre>
+            </li>
+            <li><code>align-self</code>: Alinea un elemento individualmente. Ejemplo:
+                <pre><code>align-self: auto | flex-start | flex-end | center | baseline | stretch;</code></pre>
+            </li>
+        </ul>
+
+        <h2>Ejemplo 3: Propiedad <code>flex</code></h2>
+        <div class="flex-container">
+            <div class="flex-item" style="flex: 2;">Elemento Grande</div>
+            <div class="flex-item" style="flex: 1;">Elemento Pequeño</div>
+            <div class="flex-item" style="flex: 1;">Elemento Pequeño</div>
+        </div>
+
+        <h2>Conclusión</h2>
+        <p>Flexbox es una herramienta poderosa para construir diseños modernos y responsivos. Experimenta con las propiedades mencionadas para crear tus propios diseños flexibles.</p>
+    </div>
+</body>
+
+</html>
