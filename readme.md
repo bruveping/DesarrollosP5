@@ -39,6 +39,8 @@ redacta informe académico https://bruveping.github.io/DesarrollosP5/contarPalab
 
 Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssDisplay
 
+Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssEjercicioLayout20241225
+
 
 
 
