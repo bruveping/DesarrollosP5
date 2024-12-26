@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+    <div id="container">
+        <header>
+            <h1>cabecera</h1>
+        </header>
+
+        <nav>
+            <ul>
+                <li>
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li>
+                    <a href="index.html">Página 1</a>
+                </li>
+                <li>
+                    <a href="index.html">Página 2</a>
+                </li>
+                <li>
+                    <a href="index.html">Blog</a>
+                </li>
+                <li>
+                    <a href="index.html">Contacto</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="clearfix"></div>
+
+        <section id="content">
+            <article>
+                <h2>Artículo 1</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore libero dolore fugiat quam, molestias
+                    minus quo maiores ut ipsa magni, debitis, harum distinctio odit aperiam? Nobis labore a consequuntur
+                    animi.</p>
+            </article>
+            <article>
+                <h2>Artículo 2</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore libero dolore fugiat quam, molestias
+                    minus quo maiores ut ipsa magni, debitis, harum distinctio odit aperiam? Nobis labore a consequuntur
+                    animi.</p>
+            </article>
+            <article>
+                <h2>Artículo 2</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore libero dolore fugiat quam, molestias
+                    minus quo maiores ut ipsa magni, debitis, harum distinctio odit aperiam? Nobis labore a consequuntur
+                    animi.</p>
+            </article>
+        </section>
+
+        <aside>
+            <h2>Barra lateral</h2>
+            <form>
+                <input type="text">
+                <input type="submit" value="Buscar" />
+            </form>
+
+        </aside>
+        <div class="clearfix"></div>
+
+        <footer>
+            <p>Pie de página</p>
+        </footer>
+        <div>
+            <h2>
+                Css de esta página
+            </h2>
+            <code>
+/* Aplica un reset de margen y padding a todos los elementos */<br> * {<br> margin: 0px;<br> padding: 0px;<br> }<br> <br> /* Estilo del cuerpo del documento */<br> body {<br> background: lightgray; /* Fondo gris claro */<br> font-family: Arial, Helvetica, sans-serif; /* Fuente tipográfica */<br> }<br> <br> /* Estilo del contenedor principal */<br> #container {<br> width: 70%; /* Ancho del 70% del contenedor principal */<br> border: 1px solid black; /* Borde sólido negro */<br> margin: auto; /* Centrar el contenedor */<br> }<br> <br> /* Estilo del encabezado */<br> header {<br> background: red; /* Fondo rojo */<br> height: 100px; /* Altura de 100px */<br> width: 100%; /* Ancho completo */<br> margin: 0px; /* Sin margen */<br> text-align: center; /* Centrar el texto */<br> line-height: 100px; /* Alinear verticalmente el texto */<br> color: white; /* Color del texto blanco */<br> border-bottom: 3px dashed black; /* Borde inferior discontinuo negro */<br> }<br> <br> /* Estilo de la barra de navegación */<br> nav {<br> background: lightblue; /* Fondo azul claro */<br> height: 50px; /* Altura de 50px */<br> border-bottom: 1px solid black; /* Borde inferior sólido negro */<br> }<br> <br> /* Estilo de los elementos de la lista de navegación */<br> nav ul li {<br> float: left; /* Flotar a la izquierda */<br> list-style: none; /* Sin estilo de lista */<br> margin: 10px; /* Margen de 10px */<br> line-height: 30px; /* Altura de línea de 30px */<br> }<br> <br> /* Utilizado para limpiar flotantes */<br> .clearfix {<br> clear: both; /* Limpiar ambos lados flotantes */<br> }<br> <br> /* Estilo del contenido principal */<br> #content {<br> float: left; /* Flotar a la izquierda */<br> width: 73%; /* Ancho del 73% */<br> background: green; /* Fondo verde */<br> min-height: 500px; /* Altura mínima de 500px */<br> padding-top: 10px; /* Espaciado superior de 10px */<br> padding-bottom: 10px; /* Espaciado inferior de 10px */<br> }<br> <br> /* Estilo de los artículos */<br> .artice {<br> color: white; /* Color del texto blanco */<br> margin-top: 15px; /* Margen superior de 15px */<br> margin-bottom: 15px; /* Margen inferior de 15px */<br> padding-bottom: 10px; /* Espaciado inferior de 10px */<br> border-bottom: 1px solid #eee; /* Borde inferior sólido gris claro */<br> }<br> <br> /* Estilo del primer artículo */<br> .artice:first-child {<br> border-top: 1px solid #eee; /* Borde superior sólido gris claro */<br> padding-top: 10px; /* Espaciado superior de 10px */<br> }<br> <br> /* Estilo de los encabezados de los artículos */<br> article h2 {<br> font-size: 1.5em; /* Tamaño de fuente de 1.5em */<br> }<br> <br> /* Estilo del contenido adicional */<br> aside {<br> float: left; /* Flotar a la izquierda */<br> width: calc(27% - 20px); /* Ancho del 27% menos 20px */<br> background: orange; /* Fondo naranja */<br> min-height: 500px; /* Altura mínima de 500px */<br> padding: 10px; /* Espaciado de 10px */<br> }<br> <br> /* Estilo del pie de página */<br> footer {<br> background: black; /* Fondo negro */<br> color: white; /* Color del texto blanco */<br> text-align: center; /* Centrar el texto */<br> height: 50px; /* Altura de 50px */<br> line-height: 50px; /* Alinear verticalmente el texto */<br> }<br> <br>
+
+
+            </code>
+        </div>
+    </div>
+</body>
+
+</html>
