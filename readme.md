@@ -41,6 +41,8 @@ Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssDisplay
 
 Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssEjercicioLayout20241225
 
+Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssAlinearElementos
+
 
 
 
