@@ -50,27 +50,26 @@ nav ul li{
 #content{
     width: 73%;
     float: left;
-    width: 73%;
+    width: calc(73% - 20px);
     background: green;
     min-height: 500px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px;
 
 }
 
-.artice{
+.article{
     color: white;
     margin-top: 15px;
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-.artice:first-child{
+.article:first-child{
     border-top: 1px solid #eee;
     padding-top: 10px;
 }
 
-article h2{
+.article h2{
 font-size: 1.5em;
 
 }
@@ -83,6 +82,9 @@ aside{
     padding: 10px;
 }
 
+.entraTexto{
+    width: 90%;
+}
 
 footer{
     background: black;
