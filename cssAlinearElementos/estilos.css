@@ -1,0 +1,83 @@
+*{margin: 0;
+padding: 0;}
+
+#container{
+    background: black;
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+}
+
+h1{
+    color: white;
+    text-align: center;
+}
+
+.SubContainer01{
+    background: grey;
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.SubContainer01 *{
+    background: red;
+    margin: 3px;
+    width: 220px;
+    display: inline-block;
+}
+.SubContainer02{
+    background: grey;
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+    margin-top: 10px;
+
+}
+
+.SubContainer02 *{
+    background: red;
+    margin: 3px;
+    width: 220px;
+    float:left;
+}
+
+.clearfix{
+    clear: both;
+}
+.SubContainer03{
+
+    background: grey;
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content:space-around;
+}
+
+.SubContainer03 *{
+    background: red;
+    margin: 3px;
+    width: 220px;
+
+}
+.SubContainer04{
+    background: grey;
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+}
+
+.SubContainer04 *{
+    background: red;
+    margin: 3px;
+    width: 220px;
+
+}
