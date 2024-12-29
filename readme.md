@@ -43,6 +43,8 @@ Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssEjercicioLay
 
 Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssAlinearElementos
 
+Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/gridLayout
+
 
 
 
