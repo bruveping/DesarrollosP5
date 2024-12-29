@@ -1,0 +1,53 @@
+body{
+margin: 0;
+padding: 0;
+background: rgb(226, 223, 223);
+font-family: Arial, Helvetica, sans-serif;
+}
+
+#container{
+    background: black;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: 10% 15% 50% 10% 15% 15%;
+
+}
+
+.caja{
+    background: red;
+    color: white;
+    border: 1px solid black;
+}
+
+#container .caja:nth-child(1){
+    background: rgb(189, 236, 18);
+grid-column: 1/4;
+}
+
+#container .caja:nth-child(2){
+    background: rgb(236, 123, 18);
+grid-column: 1/3;
+}
+
+#container .caja:nth-child(5){
+    background: rgb(10, 112, 70);
+grid-column: 2/4;
+}
+
+#container .caja:nth-child(7){
+    background: rgb(59, 126, 189);
+grid-column: 2/4;
+}
+
+h1{
+    color: brown;
+    text-align: center;
+    font-size: 2.7em;
+}
+
+
+#container .caja:nth-child(4){
+    background: rgb(236, 167, 18);
+overflow: auto; /* Agrega barra de desplazamiento si es necesario */
+}

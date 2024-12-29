@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Layout Example</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+    <div id="container">
+        <h1>Prueba Grid-Layout</h1>
+        <div class="caja">2</div>
+        <div class="caja">3</div>
+        <div class="caja">
+            <p>4</p>
+
+            <h2>Configuración del Grid Container:</h2>
+            <ul>
+                <li>
+                    Un contenedor #container que usa Grid Layout con 3 columnas y 5 filas.
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    Las filas tienen alturas variadas (10%, 15%, 50%, 10%, 15%).
+                </li>
+            </ul>
+            <h2>Estilos para las Cajas:</h2>
+            <ul>
+                <li>
+                    Todas las cajas tienen un fondo rojo y texto blanco por defecto.
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    Se cambió el color de fondo de varias cajas específicas utilizando nth-child.
+                </li>
+            </ul>
+            <h2>Distribución de las Cajas en la Cuadrícula:</h2>
+            <ul>
+                <li>
+                    La primera caja ocupa todas las columnas (grid-column: 1 / 4).
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    La segunda caja ocupa las dos primeras columnas (grid-column: 1 / 3).
+                </li>
+            </ul>
+        </div>
+        <div class="caja">5</div>
+        <div class="caja">6</div>
+        <div class="caja">7</div>
+        <div class="caja">8</div>
+        <div class="caja">9</div>
+        <div class="caja">10</div>
+    </div>
+</body>
+
+</html>
