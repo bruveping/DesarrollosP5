@@ -45,6 +45,8 @@ Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssAlinearEleme
 
 Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/gridLayout
 
+Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssEjercicioGridLayout2024_12_30
+
 
 
 
