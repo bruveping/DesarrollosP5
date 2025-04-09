@@ -55,25 +55,26 @@ Mapa Mental Mermaid a SVG https://bruveping.github.io/DesarrollosP5/MapaMermaidS
 
 ```mermaid
 graph TD
-    A[1. Crear un repositorio] --> A1[Nombre opcional: usuario.github.io]
-    A --> A2[Publico o privado]
+    A[1. Crear un repositorio] --> A1[Nombre opcional como usuario.github.io]
+    A --> A2[Puede ser publico o privado]
 
-    B[2. Subir archivos del sitio] --> B1[index.html]
-    B --> B2[Otros archivos: CSS, JS, imágenes]
+    B[2. Subir archivos del sitio] --> B1[Archivo index.html]
+    B --> B2[Otros archivos como CSS y JS]
 
     C[3. Activar GitHub Pages] --> C1[Ir a Settings y luego Pages]
-    C1 --> C2[Elegir rama: main o master]
+    C1 --> C2[Elegir rama main o master]
     C2 --> C3[Elegir carpeta raiz o docs]
     C3 --> C4[Guardar cambios]
 
-    D[4. Obtener la URL] --> D1[https://usuario.github.io/repositorio]
+    D[4. Obtener la URL] --> D1[Direccion del sitio generada por GitHub]
 
-    E[5. Actualizar el sitio] --> E1[Hacer push a la rama]
-    E --> E2[Usar GitHub Desktop o VS Code]
+    E[5. Actualizar el sitio] --> E1[Hacer push a la rama configurada]
+    E --> E2[Usar herramientas como GitHub Desktop o VS Code]
 
-    F[6. Personalizar dominio] --> F1[Agregar dominio en Pages]
-    F1 --> F2[Configurar DNS en proveedor de dominio]
+    F[6. Personalizar dominio] --> F1[Agregar dominio en la configuracion de Pages]
+    F1 --> F2[Configurar los DNS del dominio]
 ```
+
 
 
 
