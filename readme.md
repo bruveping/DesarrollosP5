@@ -35,7 +35,7 @@ mueve texto en red 2 https://bruveping.github.io/DesarrollosP5/mueveElTextojs202
 
 redacta informe académico https://bruveping.github.io/DesarrollosP5/redactarInformeAcade/
 
-redacta informe académico https://bruveping.github.io/DesarrollosP5/contarPalabras/
+escribir con Métrica https://bruveping.github.io/DesarrollosP5/contarPalabras/
 
 Pequeño manual de CSS https://bruveping.github.io/DesarrollosP5/cssDisplay
 
