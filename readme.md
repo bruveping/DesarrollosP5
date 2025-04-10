@@ -66,7 +66,7 @@ graph TD
     C2 --> C3[Elegir carpeta raíz o docs]
     C3 --> C4[Guardar cambios]
 
-    D[4 - Obtener URL del sitio] --> D1[[https://usuario.github.io/repositorio]]
+    D[4 - Obtener URL del sitio] --> D1|[https://usuario.github.io/repositorio]
 
     E[5 - Actualizar sitio] --> E1[Push a la rama configurada]
     E --> E2[Usar GitHub Desktop o VS Code]
