@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo Simple</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: center; /* Centra el contenido del body */
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input-area {
+            margin-bottom: 20px;
+            display: flex; /* Usa flexbox para alinear input y botón */
+            justify-content: center; /* Centra los elementos horizontalmente */
+            gap: 10px; /* Espacio entre input y botón */
+        }
+        #nameInput {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex-grow: 1; /* Permite que el input crezca */
+            max-width: 300px; /* Limita el ancho máximo del input */
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #raffleButton {
+            background-color: #28a745;
+            margin-top: 20px; /* Espacio arriba del botón de sortear */
+            display: block; /* Hace que ocupe todo el ancho disponible */
+            width: 100%; /* Ocupa el ancho del contenedor */
+            max-width: 400px; /* Limita el ancho máximo */
+            margin-left: auto; /* Centra el botón */
+            margin-right: auto; /* Centra el botón */
+        }
+        #raffleButton:hover {
+            background-color: #218838;
+        }
+        #raffleButton:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        h2 {
+            margin-top: 30px;
+            color: #555;
+        }
+        #participantsList {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            min-height: 50px; /* Espacio mínimo aunque esté vacío */
+            background-color: #fff;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: left; /* Alinea los nombres a la izquierda dentro de la lista */
+        }
+        #participantsList li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        #participantsList li:last-child {
+            border-bottom: none;
+        }
+        #winnerDisplay {
+            margin-top: 30px;
+            font-size: 1.5em; /* Tamaño más grande para el ganador */
+            font-weight: bold;
+            color: #dc3545; /* Color distintivo para el ganador */
+            min-height: 30px; /* Espacio reservado aunque no haya ganador */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sorteo Rápido</h1>
+
+    <div class="input-area">
+        <input type="text" id="nameInput" placeholder="Ingresa un nombre">
+        <button id="addButton">Agregar</button>
+    </div>
+
+    <h2>Participantes:</h2>
+    <ul id="participantsList">
+        </ul>
+
+    <button id="raffleButton" disabled>Sortear</button>
+
+    <div id="winnerDisplay">
+        </div>
+
+    <script>
+        // Referencias a los elementos del DOM
+        const nameInput = document.getElementById('nameInput');
+        const addButton = document.getElementById('addButton');
+        const participantsList = document.getElementById('participantsList');
+        const raffleButton = document.getElementById('raffleButton');
+        const winnerDisplay = document.getElementById('winnerDisplay');
+
+        // Array para almacenar los nombres de los participantes
+        let participants = [];
+
+        // Función para actualizar la lista de participantes en el HTML
+        function updateParticipantsList() {
+            // Limpiar la lista actual
+            participantsList.innerHTML = '';
+            // Volver a generar la lista desde el array
+            participants.forEach(name => {
+                const listItem = document.createElement('li');
+                listItem.textContent = name;
+                participantsList.appendChild(listItem);
+            });
+
+            // Habilitar o deshabilitar el botón de sortear según si hay participantes
+            if (participants.length > 1) { // Se necesita al menos 2 para sortear
+                raffleButton.disabled = false;
+            } else {
+                raffleButton.disabled = true;
+            }
+
+            // Limpiar el display del ganador si se modifica la lista
+            winnerDisplay.textContent = '';
+        }
+
+        // Event Listener para el botón "Agregar"
+        addButton.addEventListener('click', () => {
+            const name = nameInput.value.trim(); // Obtener el nombre y quitar espacios extra
+            if (name) { // Asegurarse de que el nombre no esté vacío
+                participants.push(name); // Agregar el nombre al array
+                nameInput.value = ''; // Limpiar el campo de entrada
+                updateParticipantsList(); // Actualizar la lista en pantalla
+                nameInput.focus(); // Poner el foco de nuevo en el input para agregar otro nombre fácilmente
+            } else {
+                alert("Por favor, ingresa un nombre válido.");
+            }
+        });
+
+        // Permitir agregar nombres presionando Enter en el input
+        nameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Evitar el comportamiento por defecto del Enter (submit formulario)
+                addButton.click(); // Simular clic en el botón Agregar
+            }
+        });
+
+        // Event Listener para el botón "
