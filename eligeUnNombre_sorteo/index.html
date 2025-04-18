@@ -131,12 +131,14 @@
                 participantsList.appendChild(listItem);
             });
 
-            // Habilitar o deshabilitar el botón de sortear según si hay participantes
-            if (participants.length > 1) { // Se necesita al menos 2 para sortear
+            // --- CORRECCIÓN ---
+            // Habilitar o deshabilitar el botón de sortear según si hay CERO o más participantes
+            if (participants.length > 0) { // Habilitar si hay al menos UN participante
                 raffleButton.disabled = false;
             } else {
                 raffleButton.disabled = true;
             }
+            // --- FIN CORRECCIÓN ---
 
             // Limpiar el display del ganador si se modifica la lista
             winnerDisplay.textContent = '';
@@ -163,4 +165,30 @@
             }
         });
 
-        // Event Listener para el botón "
+        // Event Listener para el botón "Sortear"
+        raffleButton.addEventListener('click', () => {
+            // --- CORRECCIÓN ---
+            // Solo verificar si está vacío. Si hay 1 o más, se sortea.
+            if (participants.length === 0) {
+                winnerDisplay.textContent = 'No hay participantes para sortear.';
+                return; // Salir si no hay nadie
+            }
+            // Ya no se necesita la comprobación de participants.length === 1
+            // --- FIN CORRECCIÓN ---
+
+            // Calcular un índice aleatorio (funciona para length 1, el índice será 0)
+            const randomIndex = Math.floor(Math.random() * participants.length);
+            // Obtener el nombre ganador
+            const winner = participants[randomIndex];
+
+            // Mostrar el ganador
+            winnerDisplay.textContent = `🎉 Ganó => ${winner} 🎉`;
+        });
+
+        // Inicializar la lista (por si acaso, aunque estará vacía al principio)
+        updateParticipantsList();
+
+    </script>
+
+</body>
+</html>
