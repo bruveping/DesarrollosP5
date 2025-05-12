@@ -43,13 +43,14 @@
         <label for="fileType">Tipo de documento:</label>
         <select id="fileType">
             <option value="markdown">.md</option>
+            <option value="javascript">.js</option>
             <option value="python">.py</option>
-            <option value="markdown">.md</option>
             <option value="html">.html</option>
             <option value="css">.css</option>
         </select>
         <button onclick="downloadFile()">Descargar</button>
         <button onclick="clearEditor()">Limpiar</button>
+        <button onclick="copyToClipboard()">Copiar al portapapeles</button>
         <div id="fontSizeControl">
             <label for="fontSize">Tamaño del texto:</label>
             <input type="range" id="fontSize" min="6" max="120" value="14" oninput="updateFontSize(this.value)">
@@ -57,6 +58,7 @@
         </div>
     </div>
     <div id="editor">Escribe tu código aquí...</div>
+    <iframe src="editor_Mermaid.html" width="80%" height="800px" style="border:none;"></iframe>
     <script>
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai");
@@ -64,7 +66,8 @@
         editor.setKeyboardHandler("ace/keyboard/vim");
         editor.setOptions({
             fontSize: "14px",
-            highlightActiveLine: false
+            highlightActiveLine: false,
+            wrap: true  // Activa el ajuste de línea
         });
 
         document.getElementById("fileType").addEventListener("change", function() {
@@ -96,27 +99,19 @@
             editor.setValue("");
         }
 
+        function copyToClipboard() {
+            var text = editor.getValue();
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Texto copiado al portapapeles.");
+            }).catch(err => {
+                console.error("Error al copiar:", err);
+            });
+        }
+
         function updateFontSize(size) {
             editor.setOptions({ fontSize: size + "px" });
             document.getElementById("fontSizeValue").textContent = size;
         }
     </script>
-
-<iframe src="editor_Mermaid.html" width="80%" height="800px" style="border:none;"></iframe>
-
-    <p>
-        🔹 Input para definir el nombre del archivo antes de descargarlo.
-    </p>
-        <p>
-        🔹 Fondo oscuro y interfaz minimalista con estilo Vim. 
-    </p>
-        <p>
-        🔹 Botón "Limpiar" para borrar el contenido del editor. 
-    </p>
-        <p>
-        🔹 Control deslizante para ajustar el tamaño del texto de 6px a 120px.
-    </p>
 </body>
 </html>
-
-
