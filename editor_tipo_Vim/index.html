@@ -29,6 +29,9 @@
             border: 1px solid #ccc;
             margin: auto;
         }
+        #fontSizeControl {
+            margin-top: 10px;
+        }
     </style>
     <link rel="icon" type="image/png" href="favicon.png">
 </head>
@@ -47,6 +50,11 @@
         </select>
         <button onclick="downloadFile()">Descargar</button>
         <button onclick="clearEditor()">Limpiar</button>
+        <div id="fontSizeControl">
+            <label for="fontSize">Tamaño del texto:</label>
+            <input type="range" id="fontSize" min="6" max="120" value="14" oninput="updateFontSize(this.value)">
+            <span id="fontSizeValue">14</span>px
+        </div>
     </div>
     <div id="editor">Escribe tu código aquí...</div>
     <script>
@@ -86,6 +94,11 @@
 
         function clearEditor() {
             editor.setValue("");
+        }
+
+        function updateFontSize(size) {
+            editor.setOptions({ fontSize: size + "px" });
+            document.getElementById("fontSizeValue").textContent = size;
         }
     </script>
 </body>
