@@ -87,6 +87,8 @@ generador_progresiones_acordes_aleatorio    https://bruveping.github.io/Desarrol
 
 Editor tipo Vim con visualizador Mermaid https://bruveping.github.io/DesarrollosP5/otro_editor_mermaid/
 
+herramienta_para_componer_canciones 🎵   https://bruveping.github.io/DesarrollosP5/herramienta_para_componer_canciones/
+
 
 
 
