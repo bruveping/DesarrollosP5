@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contador de Sílabas</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+  <h1>Contador de Sílabas para Métrica de Versos</h1>
+
+
+  <div class="contenedor">
+    <div class="ordenar">
+      <p class="instrucciones">Escribe tu poesía en el cuadro de abajo.<br> 
+        El número de sílabas por línea se mostrará
+        automáticamente:</p>
+      <textarea id="poetryInput" placeholder="Escribe aquí tu poesía...">
+[Título]
+[Intro]
+escribe aquí 😀
+[Verso]
+escribe aquí
+[Coro]
+escribe aquí
+[Verso]
+escribe aquí
+[Coro]
+escribe aquí
+[Puente]
+escribe aquí
+[Outro]
+escribe aquí 🎵
+      </textarea>
+    </div>
+
+    <div class="ordenar">
+      <h2>Conteo de sílabas:</h2>
+      <pre id="syllableResults">Línea 1: 0 sílabas</pre>
+    </div>
+  </div>
+  <script src="funciones.js"></script>
+</body>
+
+</html>

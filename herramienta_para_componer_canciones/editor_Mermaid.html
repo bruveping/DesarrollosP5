@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Mermaid</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    textarea {
+      width: 98%;
+      height: 200px;
+      padding: 1rem;
+      margin: 1rem auto;
+      display: block;
+      font-family: monospace;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      background: #fff;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #357bd8;
+    }
+
+    input[type="range"] {
+      width: 200px;
+    }
+
+    #preview {
+      border: 1px solid #ccc;
+      background: white;
+      padding: 1rem;
+      margin-top: 1rem;
+      overflow: auto;
+      text-align: center;
+    }
+
+    #svgContainer {
+      transform: scale(1.0);
+      /* Aumentá el valor según lo necesites */
+      transform-origin: top center;
+      transition: transform 0.2s ease;
+      display: inline-block;
+      /*height: 400px;*/
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Editor Mermaid</h1>
+
+  <textarea id="code" placeholder="Pega tu código Mermaid aquí...">
+graph LR
+  A[Inicio] --> B{¿Está todo listo?}
+  B -- Sí --> C[Ejecutar acción]
+  B -- No --> D[Esperar condiciones]
+  </textarea>
+
+  <div class="controls">
+    <button id="renderBtn">Renderizar</button>
+    <label>Zoom:
+      <input type="range" id="zoomSlider" min="0.5" max="2" value="1" step="0.1">
+    </label>
+    <button id="downloadBtn">Descargar SVG</button>
+  </div>
+
+  <div id="preview">
+    <div id="svgContainer"></div>
+  </div>
+
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: "default" });
+
+    const codeInput = document.getElementById("code");
+    const renderBtn = document.getElementById("renderBtn");
+    const svgContainer = document.getElementById("svgContainer");
+    const zoomSlider = document.getElementById("zoomSlider");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    function inlineAllStyles(svg) {
+      const style = svg.querySelector("style");
+      if (!style) return;
+
+      const cssText = style.textContent;
+      const styleSheet = new CSSStyleSheet();
+      styleSheet.replaceSync(cssText);
+
+      const rules = Array.from(styleSheet.cssRules);
+
+      rules.forEach(rule => {
+        if (!(rule.selectorText && rule.style)) return;
+        try {
+          const elements = svg.querySelectorAll(rule.selectorText);
+          elements.forEach(el => {
+            for (let i = 0; i < rule.style.length; i++) {
+              const prop = rule.style[i];
+              el.style.setProperty(prop, rule.style.getPropertyValue(prop));
+            }
+          });
+        } catch (e) {
+          // Ignorar reglas complejas tipo :hover
+        }
+      });
+
+      style.remove();
+    }
+
+    renderBtn.addEventListener("click", async () => {
+      const code = codeInput.value;
+      const id = "mermaid-diagram";
+
+      try {
+        const { svg } = await mermaid.render(id, code);
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svg, "image/svg+xml").documentElement;
+        inlineAllStyles(svgDoc);
+        svgContainer.innerHTML = "";
+        svgContainer.appendChild(svgDoc);
+      } catch (err) {
+        svgContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+
+    zoomSlider.addEventListener("input", () => {
+      svgContainer.style.transform = `scale(${zoomSlider.value})`;
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      const svgElement = svgContainer.querySelector("svg");
+      if (!svgElement) {
+        alert("Primero tenés que renderizar un diagrama.");
+        return;
+      }
+
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgElement);
+      const blob = new Blob([svgString], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "diagrama-mermaid.svg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+
+</html>
