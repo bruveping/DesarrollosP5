@@ -85,6 +85,8 @@ Editor tipo Vim con code mirror https://bruveping.github.io/DesarrollosP5/Edtior
 
 generador_progresiones_acordes_aleatorio    https://bruveping.github.io/DesarrollosP5/generador_progresiones_acordes_aleatorio_html/
 
+Editor tipo Vim con visualizador Mermaid https://bruveping.github.io/DesarrollosP5/otro_editor_mermaid/
+
 
 
 
