@@ -51,6 +51,19 @@
         textarea {
             min-height: 100px;
         }
+        .el_button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .el_button:hover {
+            background-color: #666;
+        }
     </style>
     <link rel="icon" type="image/png" href="favicon.png">    
 </head>
@@ -144,7 +157,7 @@
     <iframe src="contador_de_silabas.html" width="80%" height="800px" style="border:none;"></iframe>
     <iframe src="editor_Md.html" width="80%" height="800px" style="border:none;"></iframe>
     <iframe src="editor_Mermaid.html" width="80%" height="800px" style="border:none;"></iframe>
-    <iframe src="https://strudel.cc" width="100%" height="800px" style="border:none;"></iframe>
+
 
 
 
@@ -877,6 +890,30 @@
         document.addEventListener('DOMContentLoaded', initializeUI);
 
     </script>
+
+
+
+<h2>Strudel REPL Editor</h2>
+<div id="strudelContainer">
+    <strudel-editor id="repl" placeholder="Escribe aquí tu poesía...">
+
+
+
+    </strudel-editor>
+    <button id="play" class="el_button">Play</button>
+    <button id="stop" class="el_button">Stop</button>
+</div>
+
+<script src="https://unpkg.com/@strudel/repl@latest"></script>
+<script>
+    window.onload = function() {
+        const repl = document.getElementById("repl");
+
+        document.getElementById("play").addEventListener("click", () => repl.editor.evaluate());
+        document.getElementById("stop").addEventListener("click", () => repl.editor.stop());
+    };
+</script>
+
 
 </body>
 </html>
