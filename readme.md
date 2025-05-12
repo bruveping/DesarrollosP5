@@ -81,6 +81,8 @@ Sketch para sortear nombres aleatoreamente https://bruveping.github.io/Desarroll
 
 Editor tipo Vim https://bruveping.github.io/DesarrollosP5/editor_tipo_Vim/
 
+Editor tipo Vim con code mirror https://bruveping.github.io/DesarrollosP5/Edtior_tipo_Vim_code_Mirror/
+
 
 
 
