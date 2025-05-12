@@ -1,3 +1,5 @@
+¡Perfecto! Aquí tienes la versión con el input para el nombre del archivo antes de la descarga. Ahora puedes personalizar el nombre del archivo fácilmente.
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -42,7 +44,7 @@
         <input type="text" id="fileName" placeholder="archivo">
         <label for="fileType">Tipo de documento:</label>
         <select id="fileType">
-            <option value="javascript">.js</option>
+            <option value="markdown">.md</option>
             <option value="python">.py</option>
             <option value="markdown">.md</option>
             <option value="html">.html</option>
@@ -69,8 +71,8 @@
 
         document.getElementById("fileType").addEventListener("change", function() {
             var modeMap = {
-                "python": "ace/mode/python",
                 "javascript": "ace/mode/javascript",
+                "python": "ace/mode/python",
                 "markdown": "ace/mode/markdown",
                 "html": "ace/mode/html",
                 "css": "ace/mode/css"
@@ -103,3 +105,7 @@
     </script>
 </body>
 </html>
+
+🔹 Input para definir el nombre del archivo antes de descargarlo. 🔹 Fondo oscuro y interfaz minimalista con estilo Vim. 🔹 Botón "Limpiar" para borrar el contenido del editor. 🔹 Control deslizante para ajustar el tamaño del texto de 6px a 120px.
+
+Dime si necesitas algún otro ajuste. ¡Este editor sigue evolucionando! 🚀💾
