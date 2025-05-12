@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Progresiones Armónicas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos adicionales si son necesarios */
+        body {
+            font-family: 'Inter', sans-serif; /* Fuente Inter */
+        }
+        /* Mejorar apariencia de selects en algunos navegadores */
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            padding-right: 2.5em; /* Espacio para la flecha */
+        }
+         /* Estilo para el contenedor principal */
+        .main-container {
+            max-width: 1200px; /* Ancho máximo */
+            margin: 0 auto; /* Centrar */
+        }
+        /* Estilo para los botones */
+        .btn {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md;
+        }
+        .btn-secondary {
+            @apply bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md;
+        }
+        /* Estilo para labels */
+        label {
+             @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        /* Estilo para inputs y selects */
+        input[type="number"], select, textarea {
+            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
+        }
+        /* Estilo para los contenedores de sección */
+        .section-container {
+            @apply bg-white p-6 rounded-lg shadow mb-6;
+        }
+        /* Estilo para el área de texto de resultados */
+        .result-display {
+            @apply bg-gray-100 p-4 rounded-md border border-gray-200 min-h-[60px] text-gray-800 whitespace-pre-wrap break-words;
+        }
+        /* Estilo para el textarea editable */
+        textarea {
+            min-height: 100px;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="favicon.png">    
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+    <div class="main-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Generador de Progresiones Armónicas</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="section-container">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Parámetros de Generación</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="total-bars">Compases (2-32):</label>
+                        <input type="number" id="total-bars" value="4" min="2" max="32" class="mt-1">
+                    </div>
+                    <div>
+                        <label for="slots-per-bar">Acordes/Compás:</label>
+                        <select id="slots-per-bar" class="mt-1">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="scale-name">Escala/Modo:</label>
+                        <select id="scale-name" class="mt-1"></select>
+                    </div>
+                    <div>
+                        <label for="key-name">Tonalidad Generación:</label>
+                        <select id="key-name" class="mt-1"></select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label>Modo Cadencia:</label>
+                    <div class="flex items-center space-x-4 mt-1">
+                        <label class="flex items-center">
+                            <input type="radio" name="cadence-mode" value="select" checked class="form-radio h-4 w-4 text-blue-600">
+                            <span class="ml-2 text-sm text-gray-700">Seleccionar</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="cadence-mode" value="random" class="form-radio h-4 w-4 text-blue-600">
+                            <span class="ml-2 text-sm text-gray-700">Aleatorio</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="cadence-select-container" class="mb-4">
+                    <label for="cadence-name">Seleccione Cadencia:</label>
+                    <select id="cadence-name" class="mt-1"></select>
+                </div>
+
+                <button id="generate-button" class="btn w-full">Generar Progresión</button>
+            </div>
+
+            <div class="section-container">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Resultados</h2>
+
+                <div class="mb-4">
+                    <label>Progresión Generada (Grados):</label>
+                    <div id="generated-degree-progression" class="result-display mt-1"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="transpose-key">Transponer a Tonalidad:</label>
+                    <div class="flex items-center gap-2 mt-1">
+                        <select id="transpose-key" class="flex-grow"></select>
+                        <button id="transpose-button" class="btn-secondary flex-shrink-0">Transponer</button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="chord-progression-output">Progresión de Acordes (Editable):</label>
+                    <textarea id="chord-progression-output" class="mt-1" placeholder="Aquí aparecerá la progresión transpuesta..."></textarea>
+                </div>
+
+                </div>
+        </div>
+         <div id="message-box" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white max-w-sm hidden z-50 transition-opacity duration-300 opacity-0">
+            <span id="message-text"></span>
+            <button id="close-message-box" class="ml-4 float-right font-bold">&times;</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants and Data (Embedded from Python logic) ---
+
+        const NOTE_NAMES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const NOTE_NAMES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+        const NOTE_TO_SEMITONE = {
+            'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5,
+            'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
+        };
+        const SEMITONE_TO_NOTE_SHARP = Object.fromEntries(NOTE_NAMES_SHARP.map((note, i) => [i, note]));
+        const SEMITONE_TO_NOTE_FLAT = Object.fromEntries(NOTE_NAMES_FLAT.map((note, i) => [i, note]));
+
+        // Determine preferred accidental based on common usage
+        const SEMITONE_TO_PREFERRED_NOTE = {
+            0: 'C', 1: 'Db', 2: 'D', 3: 'Eb', 4: 'E', 5: 'F',
+            6: 'F#', 7: 'G', 8: 'Ab', 9: 'A', 10: 'Bb', 11: 'B'
+        };
+
+        const CHORD_INTERVALS = {
+            '': [0, 4, 7], 'maj': [0, 4, 7], 'min': [0, 3, 7], 'm': [0, 3, 7], // Added 'm' alias
+            'dim': [0, 3, 6], 'aug': [0, 4, 8], '7': [0, 4, 7, 10],
+            'maj7': [0, 4, 7, 11], 'm7': [0, 3, 7, 10], 'm7b5': [0, 3, 6, 10],
+            'dim7': [0, 3, 6, 9], 'hdim7': [0, 3, 6, 10], 'sus4': [0, 5, 7],
+            'sus2': [0, 2, 7], 'add9': [0, 4, 7, 14], 'madd9': [0, 3, 7, 14],
+            '6': [0, 4, 7, 9], 'm6': [0, 3, 7, 9], '9': [0, 4, 7, 10, 14],
+            'maj9': [0, 4, 7, 11, 14], 'm9': [0, 3, 7, 10, 14]
+            // Add more as needed, ensure keys are lowercase for lookup
+        };
+
+        const GRADO_BASE_TO_INT = { 'I': 0, 'II': 1, 'III': 2, 'IV': 3, 'V': 4, 'VI': 5, 'VII': 6 };
+        const ROMAN_TO_INTERVAL = { 'I': 0, 'II': 2, 'III': 4, 'IV': 5, 'V': 7, 'VI': 9, 'VII': 11 };
+
+        // Extracted and simplified from Python DB data
+        // NOTE: Weights are simplified here for demonstration. Real weights might be more nuanced.
+        const SCALES_INFO = {
+            "jonico": {
+                "key_type": "mayor", "intervals": [0, 2, 4, 5, 7, 9, 11],
+                "degrees": [
+                    { "grado_base": "I", "quality": "maj7", "function": "T", "weight": 10 },
+                    { "grado_base": "II", "quality": "m7", "function": "SD", "weight": 5 },
+                    { "grado_base": "III", "quality": "m7", "function": "T", "weight": 3 }, // Can function as T or D relative
+                    { "grado_base": "IV", "quality": "maj7", "function": "SD", "weight": 8 },
+                    { "grado_base": "V", "quality": "7", "function": "D", "weight": 10 },
+                    { "grado_base": "VI", "quality": "m7", "function": "T", "weight": 4 }, // Can function as T or SD relative
+                    { "grado_base": "VII", "quality": "m7b5", "function": "D", "weight": 2 }
+                ]
+            },
+            "dorico": {
+                "key_type": "menor", "intervals": [0, 2, 3, 5, 7, 9, 10],
+                 "degrees": [ // Example degrees for Dorico
+                    { "grado_base": "I", "quality": "m7", "function": "T", "weight": 10 },
+                    { "grado_base": "II", "quality": "m7", "function": "SD", "weight": 5 },
+                    { "grado_base": "bIII", "quality": "maj7", "function": "T", "weight": 6 },
+                    { "grado_base": "IV", "quality": "7", "function": "SD", "weight": 8 }, // Characteristic IV7
+                    { "grado_base": "V", "quality": "m7", "function": "D", "weight": 4 }, // Minor V
+                    { "grado_base": "VI", "quality": "m7b5", "function": "SD", "weight": 3 },
+                    { "grado_base": "bVII", "quality": "maj7", "function": "D", "weight": 7 }
+                ]
+            },
+             "frigio": {
+                "key_type": "menor", "intervals": [0, 1, 3, 5, 7, 8, 10],
+                "degrees": [ // Example degrees
+                    { "grado_base": "I", "quality": "m7", "function": "T", "weight": 10 },
+                    { "grado_base": "bII", "quality": "maj7", "function": "SD", "weight": 8 }, // Characteristic bIImaj7
+                    { "grado_base": "bIII", "quality": "7", "function": "T", "weight": 5 },
+                    { "grado_base": "IV", "quality": "m7", "function": "SD", "weight": 6 },
+                    { "grado_base": "V", "quality": "dim", "function": "D", "weight": 3 }, // Diminished V
+                    { "grado_base": "bVI", "quality": "maj7", "function": "SD", "weight": 7 },
+                    { "grado_base": "bVII", "quality": "m7", "function": "D", "weight": 4 }
+                ]
+            },
+            "lidio": {
+                "key_type": "mayor", "intervals": [0, 2, 4, 6, 7, 9, 11],
+                "degrees": [ // Example degrees
+                    { "grado_base": "I", "quality": "maj7", "function": "T", "weight": 10 },
+                    { "grado_base": "II", "quality": "7", "function": "SD", "weight": 7 },
+                    { "grado_base": "III", "quality": "m7", "function": "T", "weight": 4 },
+                    { "grado_base": "#IV", "quality": "m7b5", "function": "SD", "weight": 8 }, // Characteristic #IVm7b5
+                    { "grado_base": "V", "quality": "maj7", "function": "D", "weight": 9 },
+                    { "grado_base": "VI", "quality": "m7", "function": "T", "weight": 5 },
+                    { "grado_base": "VII", "quality": "m7", "function": "D", "weight": 3 }
+                ]
+            },
+            "mixolidio": {
+                "key_type": "mayor", "intervals": [0, 2, 4, 5, 7, 9, 10],
+                 "degrees": [ // Example degrees
+                    { "grado_base": "I", "quality": "7", "function": "T", "weight": 10 }, // Characteristic I7
+                    { "grado_base": "II", "quality": "m7", "function": "SD", "weight": 5 },
+                    { "grado_base": "III", "quality": "dim", "function": "T", "weight": 3 },
+                    { "grado_base": "IV", "quality": "maj7", "function": "SD", "weight": 8 },
+                    { "grado_base": "V", "quality": "m7", "function": "D", "weight": 6 },
+                    { "grado_base": "VI", "quality": "m7", "function": "T", "weight": 4 },
+                    { "grado_base": "bVII", "quality": "maj7", "function": "D", "weight": 9 } // Characteristic bVIImaj7
+                ]
+            },
+            "eolica": { // Natural Minor
+                "key_type": "menor", "intervals": [0, 2, 3, 5, 7, 8, 10],
+                "degrees": [
+                    { "grado_base": "I", "quality": "m7", "function": "T", "weight": 10 },
+                    { "grado_base": "II", "quality": "m7b5", "function": "SD", "weight": 4 },
+                    { "grado_base": "bIII", "quality": "maj7", "function": "T", "weight": 7 },
+                    { "grado_base": "IV", "quality": "m7", "function": "SD", "weight": 8 },
+                    { "grado_base": "V", "quality": "m7", "function": "D", "weight": 5 }, // Natural minor Vm7
+                    { "grado_base": "bVI", "quality": "maj7", "function": "SD", "weight": 6 },
+                    { "grado_base": "bVII", "quality": "7", "function": "D", "weight": 5 }
+                ]
+            },
+             "menor_armonica": {
+                "key_type": "menor", "intervals": [0, 2, 3, 5, 7, 8, 11], // Raised 7th
+                "degrees": [ // Example degrees - often mixed with natural/melodic
+                    { "grado_base": "I", "quality": "m(maj7)", "function": "T", "weight": 8 }, // Characteristic Im(maj7)
+                    { "grado_base": "II", "quality": "m7b5", "function": "SD", "weight": 4 },
+                    { "grado_base": "bIII", "quality": "aug(maj7)", "function": "T", "weight": 5 }, // Augmented bIII
+                    { "grado_base": "IV", "quality": "m7", "function": "SD", "weight": 7 },
+                    { "grado_base": "V", "quality": "7", "function": "D", "weight": 10 }, // Major V7 (dominant)
+                    { "grado_base": "bVI", "quality": "maj7", "function": "SD", "weight": 6 },
+                    { "grado_base": "VII", "quality": "dim7", "function": "D", "weight": 9 } // Diminished VII
+                ]
+            },
+            "menor_melodica": { // Ascending form shown
+                "key_type": "menor", "intervals": [0, 2, 3, 5, 7, 9, 11], // Raised 6th and 7th
+                "degrees": [ // Example degrees - often mixed
+                    { "grado_base": "I", "quality": "m(maj7)", "function": "T", "weight": 8 }, // Or Im7
+                    { "grado_base": "II", "quality": "m7", "function": "SD", "weight": 6 },
+                    { "grado_base": "bIII", "quality": "aug(maj7)", "function": "T", "weight": 4 },
+                    { "grado_base": "IV", "quality": "7", "function": "SD", "weight": 7 }, // Dominant IV7
+                    { "grado_base": "V", "quality": "7", "function": "D", "weight": 10 }, // Dominant V7
+                    { "grado_base": "VI", "quality": "m7b5", "function": "D", "weight": 5 }, // Raised VI
+                    { "grado_base": "VII", "quality": "m7b5", "function": "D", "weight": 5 } // Raised VII
+                ]
+            }
+            // Add Locrian if needed
+        };
+
+        // Simplified - Combine borrowed/secondary for demo
+        const BORROWED_SECONDARY_CHORDS = {
+            "mayor": [ // Chords usable in major keys
+                { "grado_detalle": "IVm7", "analysis": "SD", "weight": 5 }, // Borrowed from minor
+                { "grado_detalle": "bVImaj7", "analysis": "SD", "weight": 4 }, // Borrowed from minor
+                { "grado_detalle": "bVII7", "analysis": "SD", "weight": 3 }, // Borrowed from minor (can be D prep)
+                { "grado_detalle": "V7/V", "analysis": "D", "weight": 6 }, // Secondary dominant to V
+                { "grado_detalle": "V7/II", "analysis": "D", "weight": 5 }, // Secondary dominant to II
+                { "grado_detalle": "V7/VI", "analysis": "D", "weight": 4 }, // Secondary dominant to VI
+                { "grado_detalle": "V7/IV", "analysis": "D", "weight": 3 }, // Secondary dominant to IV
+                 { "grado_detalle": "IIm7b5", "analysis": "SD", "weight": 2 }, // Borrowed from minor
+                 { "grado_detalle": "bIIImaj7", "analysis": "T", "weight": 2 }, // Borrowed from minor (Tonic function)
+                 { "grado_detalle": "VIIdim7/V", "analysis": "D", "weight": 3 }, // Secondary leading tone to V
+            ],
+            "menor": [ // Chords usable in minor keys
+                { "grado_detalle": "V7", "analysis": "D", "weight": 10 }, // From harmonic/melodic minor (very common)
+                { "grado_detalle": "IVmaj7", "analysis": "SD", "weight": 4 }, // Borrowed from parallel major (Lydian sound)
+                { "grado_detalle": "IImaj7", "analysis": "SD", "weight": 3 }, // Borrowed from parallel major (Lydian sound)
+                { "grado_detalle": "Imaj7", "analysis": "T", "weight": 5 }, // Picardy third / Borrowed from major
+                { "grado_detalle": "V7/bIII", "analysis": "D", "weight": 4 }, // Secondary dominant to bIII
+                { "grado_detalle": "V7/bVI", "analysis": "D", "weight": 3 }, // Secondary dominant to bVI
+                { "grado_detalle": "V7/bVII", "analysis": "D", "weight": 3 }, // Secondary dominant to bVII
+                { "grado_detalle": "V7/IV", "analysis": "D", "weight": 4 }, // Secondary dominant to IVm
+                { "grado_detalle": "VIIdim7", "analysis": "D", "weight": 8 }, // From harmonic minor
+                { "grado_detalle": "IIm7", "analysis": "SD", "weight": 5 }, // From melodic minor / Dorian
+            ]
+        };
+
+        const CADENCE_DEGREES = {
+            "autentica": {
+                "mayor": ["V7", "Imaj7"],
+                "menor": ["V7", "Im7"] // Often uses V7 from harmonic minor
+            },
+            "plagal": {
+                "mayor": ["IVmaj7", "Imaj7"],
+                "menor": ["IVm7", "Im7"]
+            },
+            "rota": { // Deceptive
+                "mayor": ["V7", "VIm7"],
+                "menor": ["V7", "bVImaj7"]
+            },
+            "semicadencia": { // Half cadence
+                "mayor": ["IVmaj7", "V7"], // Common example ending on V
+                "menor": ["IVm7", "V7"] // Common example ending on V
+            },
+             "frigia": { // Phrygian half cadence (common in minor)
+                "mayor": ["IV6", "V"], // Less common in major
+                "menor": ["IVm6", "V"] // IVm(6) -> V (often major V)
+            }
+            // Add more cadences
+        };
+
+        const CADENCE_FUNCTIONAL_PATHS = {
+            'autentica': ['D', 'T'],
+            'plagal': ['SD', 'T'],
+            'semicadencia': ['D'], // Ends on Dominant
+            'rota': ['D', 'T'], // Functionally D->T, but resolves to VI or bVI
+            'frigia': ['SD', 'D'] // Functionally SD -> D (ends on V)
+        };
+
+        const FUNCTIONAL_TRANSITIONS = {
+            'Inicio': [['T', 100]],
+            'T': [['T', 30], ['SD', 50], ['D', 20]],
+            'SD': [['SD', 20], ['D', 80], ['T', 10]], // SD->T less common
+            'D': [['T', 90], ['SD', 5], ['D', 5]] // D->SD, D->D less common
+        };
+
+        const VALID_KEYS_EXAMPLE = (() => {
+            const notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+            const keys = [...notes];
+            notes.forEach(note => keys.push(`${note}m`));
+            return keys.sort();
+        })();
+
+        // MIDI related constants removed (DEFAULT_TEMPO, DEFAULT_VELOCITY, etc.)
+        const DEFAULT_ROOT_OCTAVE = 4; // C4 = MIDI 60 (Still needed for getChordPitches if used internally)
+        const DEFAULT_BEATS_PER_BAR = 4; // Still potentially useful for conceptual timing
+
+        // --- Global State ---
+        let lastGeneratedKey = null;
+        let lastGeneratedScale = null;
+        let lastGeneratedSlotsPerBar = null; // Keep this to know structure if needed later
+        let lastDetailedProgression = [];
+
+        // --- DOM Elements ---
+        const totalBarsInput = document.getElementById('total-bars');
+        const slotsPerBarSelect = document.getElementById('slots-per-bar');
+        const scaleNameSelect = document.getElementById('scale-name');
+        const keyNameSelect = document.getElementById('key-name');
+        const cadenceModeRadios = document.querySelectorAll('input[name="cadence-mode"]');
+        const cadenceSelectContainer = document.getElementById('cadence-select-container');
+        const cadenceNameSelect = document.getElementById('cadence-name');
+        const generateButton = document.getElementById('generate-button');
+        const generatedDegreeProgressionDiv = document.getElementById('generated-degree-progression');
+        const transposeKeySelect = document.getElementById('transpose-key');
+        const transposeButton = document.getElementById('transpose-button');
+        const chordProgressionOutputTextarea = document.getElementById('chord-progression-output');
+        // downloadMidiButton element reference removed
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const closeMessageBoxButton = document.getElementById('close-message-box');
+
+
+        // --- Utility Functions ---
+
+        // Function to show messages
+        function showMessage(text, type = 'info') {
+            messageText.textContent = text;
+            messageBox.classList.remove('hidden', 'bg-blue-500', 'bg-red-500', 'bg-yellow-500', 'opacity-0');
+            if (type === 'error') messageBox.classList.add('bg-red-500');
+            else if (type === 'warning') messageBox.classList.add('bg-yellow-500');
+            else messageBox.classList.add('bg-blue-500');
+            messageBox.classList.remove('hidden');
+             if (messageBox.timeoutId) clearTimeout(messageBox.timeoutId);
+             messageBox.timeoutId = setTimeout(hideMessage, 5000);
+        }
+
+        // Function to hide messages
+        function hideMessage() {
+             messageBox.classList.add('opacity-0');
+             setTimeout(() => messageBox.classList.add('hidden'), 300);
+             if (messageBox.timeoutId) { clearTimeout(messageBox.timeoutId); messageBox.timeoutId = null; }
+        }
+
+        // Weighted choice function
+        function weightedChoice(optionsWithWeights) {
+            if (!optionsWithWeights || optionsWithWeights.length === 0) return null;
+            let totalWeight = optionsWithWeights.reduce((sum, [, weight]) => sum + (weight || 0), 0);
+            if (totalWeight <= 0) {
+                 console.warn("Weighted choice: invalid weights. Returning random.");
+                 return optionsWithWeights[Math.floor(Math.random() * optionsWithWeights.length)][0];
+            }
+            let randomNum = Math.random() * totalWeight;
+            let weightSum = 0;
+            for (const [option, weight] of optionsWithWeights) {
+                weightSum += (weight || 0);
+                if (randomNum <= weightSum) return option;
+            }
+            console.warn("Weighted choice fallback triggered.");
+            return optionsWithWeights[optionsWithWeights.length - 1][0];
+        }
+
+        // Get Chord Pitches (Needed for transposition display logic, not MIDI now)
+        function getChordPitches(chordName, rootOctave = DEFAULT_ROOT_OCTAVE) {
+            // (Function content remains the same)
+             if (!chordName) return [];
+            chordName = chordName.trim();
+            if (!chordName) return [];
+            let rootNote = '';
+            let remainingName = chordName;
+            const twoCharRoots = ['C#', 'Db', 'D#', 'Eb', 'F#', 'Gb', 'G#', 'Ab', 'A#', 'Bb'];
+            let foundRoot = false;
+            for (const r of twoCharRoots) {
+                if (remainingName.toLowerCase().startsWith(r.toLowerCase())) {
+                    rootNote = r.toUpperCase().replace('B','#').replace('S','#');
+                    if (rootNote === 'DB') rootNote = 'C#';
+                    if (rootNote === 'EB') rootNote = 'D#';
+                    if (rootNote === 'GB') rootNote = 'F#';
+                    if (rootNote === 'AB') rootNote = 'G#';
+                    if (rootNote === 'BB') rootNote = 'A#';
+                    remainingName = remainingName.substring(r.length);
+                    foundRoot = true;
+                    break;
+                }
+            }
+            if (!foundRoot && remainingName.length > 0 && remainingName[0].match(/[A-G]/i)) {
+                rootNote = remainingName[0].toUpperCase();
+                 remainingName = remainingName.substring(1);
+                 if (remainingName.length > 0 && (remainingName[0] === '#' || remainingName[0] === 'b')) {
+                     let accidental = remainingName[0];
+                     rootNote += accidental;
+                     if (rootNote === 'DB') rootNote = 'C#';
+                     if (rootNote === 'EB') rootNote = 'D#';
+                     if (rootNote === 'GB') rootNote = 'F#';
+                     if (rootNote === 'AB') rootNote = 'G#';
+                     if (rootNote === 'BB') rootNote = 'A#';
+                     remainingName = remainingName.substring(1);
+                 }
+            }
+            if (!rootNote) {
+                // console.warn(`(Utils) Could not parse root note from chord: ${chordName}`); // Less verbose
+                return [];
+            }
+            const rootSemitone = NOTE_TO_SEMITONE[rootNote];
+            if (rootSemitone === undefined) {
+                // console.warn(`(Utils) Root note '${rootNote}' not recognized for chord: ${chordName}`); // Less verbose
+                return [];
+            }
+            let quality = remainingName.trim().toLowerCase();
+            if (quality === 'maj') quality = '';
+            if (quality === 'min' || quality === '-') quality = 'm';
+            if (quality === 'ø' || quality === 'o7' || quality === 'm7b5') quality = 'hdim7';
+            if (quality === 'o' || quality === '°') quality = 'dim';
+            if (quality === 'o7' || quality === '°7') quality = 'dim7';
+            if (quality === '^' || quality === '^7') quality = 'maj7';
+            if (quality === '+' ) quality = 'aug';
+            let intervals = CHORD_INTERVALS[quality];
+            if (!intervals) {
+                 if (quality.endsWith('sus4')) intervals = CHORD_INTERVALS['sus4'];
+                 else if (quality.endsWith('sus2')) intervals = CHORD_INTERVALS['sus2'];
+                 else if (quality.endsWith('maj7')) intervals = CHORD_INTERVALS['maj7'];
+                 else if (quality.endsWith('m7')) intervals = CHORD_INTERVALS['m7'];
+                 else if (quality.endsWith('7')) intervals = CHORD_INTERVALS['7'];
+                 else if (quality.endsWith('m')) intervals = CHORD_INTERVALS['m'];
+                 else {
+                     // console.warn(`(Utils) Chord quality '${quality}' not fully recognized for '${chordName}'. Assuming major triad.`); // Less verbose
+                     intervals = CHORD_INTERVALS[''];
+                 }
+            }
+            if (!intervals) {
+                // console.error(`(Utils) Could not determine intervals for chord: ${chordName}`); // Less verbose
+                return [];
+            }
+            const rootMidiPitch = (rootOctave + 1) * 12 + rootSemitone;
+            const pitches = [];
+            for (const interval of intervals) {
+                const pitch = rootMidiPitch + interval;
+                if (pitch >= 0 && pitch <= 127) {
+                    pitches.push(pitch);
+                } else {
+                    // console.warn(`(Utils) Calculated pitch ${pitch} out of MIDI range (0-127) for chord ${chordName}. Skipping pitch.`); // Less verbose
+                }
+            }
+            return pitches; // Still return pitches, even if not used for MIDI output
+        }
+
+
+        // --- Transposition Logic ---
+        function transposeProgression(degreeProgressionString, targetKey) {
+            // (Function content remains the same)
+            const chords = degreeProgressionString.split(/\s+/).filter(c => c);
+            const transposedChords = [];
+            targetKey = targetKey.trim();
+            if (!targetKey) {
+                showMessage("Clave de destino vacía.", 'error');
+                return "Error: Clave de destino vacía.";
+            }
+            const keyRootNote = targetKey.replace('m', '').toUpperCase();
+            const keySemitone = NOTE_TO_SEMITONE[keyRootNote];
+            if (keySemitone === undefined) {
+                 showMessage(`Clave de destino '${targetKey}' no válida.`, 'error');
+                return `Error: Clave de destino '${targetKey}' no válida.`;
+            }
+            const sortedRomanNumerals = Object.keys(ROMAN_TO_INTERVAL).sort((a, b) => b.length - a.length);
+            for (const chord of chords) {
+                let cleanedChord = chord.trim();
+                if (!cleanedChord || cleanedChord === 'N.C.') {
+                    transposedChords.push(cleanedChord);
+                    continue;
+                }
+                let foundRoman = false;
+                let romanPart = '';
+                let suffix = '';
+                let interval = null;
+                let alterationSemitones = 0;
+                let remainingChordPart = cleanedChord;
+                if (remainingChordPart.startsWith('#')) {
+                    alterationSemitones = 1;
+                    remainingChordPart = remainingChordPart.substring(1);
+                } else if (remainingChordPart.startsWith('b')) {
+                    alterationSemitones = -1;
+                    remainingChordPart = remainingChordPart.substring(1);
+                }
+                for (const romanNumeral of sortedRomanNumerals) {
+                    if (remainingChordPart.toUpperCase().startsWith(romanNumeral)) {
+                        romanPart = romanNumeral;
+                        suffix = remainingChordPart.substring(romanPart.length);
+                        interval = ROMAN_TO_INTERVAL[romanPart];
+                        foundRoman = true;
+                        break;
+                    }
+                }
+                if (foundRoman && interval !== null) {
+                    const transpositionInterval = interval + alterationSemitones;
+                    const transposedRootSemitone = (keySemitone + transpositionInterval + 12) % 12;
+                     let transposedNote = SEMITONE_TO_PREFERRED_NOTE[transposedRootSemitone];
+                    if (!transposedNote) {
+                        // console.warn(`Could not map semitone ${transposedRootSemitone} to note for chord ${chord}. Using fallback sharp/flat.`); // Less verbose
+                         const useFlats = targetKey.includes('b') || targetKey.toUpperCase().startsWith('F');
+                         if (useFlats) {
+                             transposedNote = SEMITONE_TO_NOTE_FLAT[transposedRootSemitone] || SEMITONE_TO_NOTE_SHARP[transposedRootSemitone];
+                         } else {
+                             transposedNote = SEMITONE_TO_NOTE_SHARP[transposedRootSemitone] || SEMITONE_TO_NOTE_FLAT[transposedRootSemitone];
+                         }
+                    }
+                    if (!transposedNote) {
+                         // console.error(`Failed to find any note name for semitone ${transposedRootSemitone}. Keeping original chord ${chord}.`); // Less verbose
+                         transposedChords.push(chord);
+                    } else {
+                        transposedChords.push(transposedNote + suffix);
+                    }
+                } else {
+                    // console.warn(`Chord '${chord}' not recognized as starting with a Roman numeral. Keeping original.`); // Less verbose
+                    transposedChords.push(chord);
+                }
+            }
+            return transposedChords.join(' ');
+        }
+
+        // --- Generation Logic ---
+
+        // Get Actual Chord Name
+        function getActualChordName(degreeDetalle, keyName, scaleName) {
+            // (Function content remains the same)
+             const transposed = transposeProgression(degreeDetalle, keyName);
+             if (transposed.startsWith("Error:")) {
+                 // console.warn(`Failed to get actual chord name for ${degreeDetalle} in key ${keyName}: ${transposed}`); // Less verbose
+                 return degreeDetalle;
+             }
+             return transposed;
+        }
+
+
+        // Generate Functional Backbone
+        function generateFunctionalBackbone(totalBars, cadenceName) {
+            // (Function content remains the same)
+            if (totalBars < 1) return [];
+            const functionalStructure = [];
+            const cadencePath = CADENCE_FUNCTIONAL_PATHS[cadenceName] || [];
+            let cadenceLength = cadencePath.length;
+            if (cadenceLength > totalBars) {
+                // console.warn(`Cadence '${cadenceName}' (${cadenceLength} bars) longer than total bars (${totalBars}). Truncating cadence.`); // Less verbose
+                cadenceLength = totalBars;
+            }
+             const barsBeforeCadence = totalBars - cadenceLength;
+            let currentFunction = 'Inicio';
+            for (let i = 0; i < barsBeforeCadence; i++) {
+                const transitions = FUNCTIONAL_TRANSITIONS[currentFunction];
+                let nextFunction;
+                if (!transitions || transitions.length === 0) {
+                    // console.warn(`No functional transitions defined from '${currentFunction}'. Defaulting to 'T'.`); // Less verbose
+                    nextFunction = 'T';
+                } else {
+                    const optionsWithWeights = transitions.map(([opt, w]) => [opt, w]);
+                    nextFunction = weightedChoice(optionsWithWeights);
+                     if (!nextFunction) {
+                         // console.warn(`Weighted choice returned null for ${currentFunction}. Defaulting to 'T'.`); // Less verbose
+                         nextFunction = 'T';
+                     }
+                }
+                functionalStructure.push(nextFunction);
+                currentFunction = nextFunction;
+            }
+            functionalStructure.push(...cadencePath.slice(0, cadenceLength));
+            if (functionalStructure.length < totalBars) {
+                 // console.warn(`Functional structure too short (${functionalStructure.length}/${totalBars}). Padding with last function.`); // Less verbose
+                 const lastFunc = functionalStructure.length > 0 ? functionalStructure[functionalStructure.length - 1] : 'T';
+                 while (functionalStructure.length < totalBars) {
+                     functionalStructure.push(lastFunc);
+                 }
+            } else if (functionalStructure.length > totalBars) {
+                 functionalStructure.length = totalBars;
+            }
+            return functionalStructure;
+        }
+
+        // Generate Chords Layer 2
+        function generateChordsLayer2(functionalStructure, totalBars, cadenceName, scaleName, keyName, slotsPerBar) {
+            // (Function content remains the same)
+             const detailedProgression = [];
+            const totalSlots = totalBars * slotsPerBar;
+            const scaleInfo = SCALES_INFO[scaleName];
+            if (!scaleInfo) {
+                showMessage(`Información de escala '${scaleName}' no encontrada.`, 'error');
+                return [];
+            }
+            const scaleDegreesInfo = scaleInfo.degrees || [];
+            const keyType = scaleInfo.key_type || 'mayor';
+            const cadenceDegreesDataRaw = (CADENCE_DEGREES[cadenceName] || {})[keyType] || [];
+            const cadenceNumDegrees = cadenceDegreesDataRaw.length;
+            const cadenceStartSlotAbs = Math.max(0, totalSlots - cadenceNumDegrees);
+            for (let absSlotIdx = 0; absSlotIdx < totalSlots; absSlotIdx++) {
+                const barIndex = Math.floor(absSlotIdx / slotsPerBar);
+                const slotInBar = absSlotIdx % slotsPerBar;
+                 if (barIndex >= functionalStructure.length) {
+                     console.error(`Bar index ${barIndex} out of bounds for functional structure (length ${functionalStructure.length}). Skipping slot.`);
+                     continue;
+                 }
+                const currentFunction = functionalStructure[barIndex];
+                let degreeToAdd = null;
+                let analysisToAdd = `${currentFunction} (Compás ${barIndex + 1})`;
+                if (absSlotIdx >= cadenceStartSlotAbs) {
+                    const cadenceDegreeIndex = absSlotIdx - cadenceStartSlotAbs;
+                    if (cadenceDegreeIndex >= 0 && cadenceDegreeIndex < cadenceNumDegrees) {
+                        degreeToAdd = cadenceDegreesDataRaw[cadenceDegreeIndex];
+                        analysisToAdd = `Cadencia '${cadenceName}' (${cadenceDegreeIndex + 1}/${cadenceNumDegrees})`;
+                    }
+                }
+                if (degreeToAdd === null) {
+                    const possibleChordsForFunction = [];
+                    scaleDegreesInfo.forEach(d => {
+                        if (d.function === currentFunction) {
+                            const quality = d.quality || '';
+                            possibleChordsForFunction.push([ `${d.grado_base}${quality}`, `Diatónico (${d.grado_base})`, d.weight || 1 ]);
+                        }
+                    });
+                    const extraChords = BORROWED_SECONDARY_CHORDS[keyType] || [];
+                    extraChords.forEach(b => {
+                         let analysisMatch = false;
+                         if (b.analysis === currentFunction) analysisMatch = true;
+                         else if (currentFunction === 'D' && b.analysis.startsWith('D de')) analysisMatch = true;
+                         else if (currentFunction === 'D' && b.analysis.startsWith('VIIdim7/')) analysisMatch = true;
+                         else if (currentFunction === 'SD' && (b.grado_detalle === 'IVm7' || b.grado_detalle === 'bVImaj7' || b.grado_detalle === 'IIm7b5')) analysisMatch = true;
+                         else if (currentFunction === 'T' && b.grado_detalle === 'bIIImaj7') analysisMatch = true;
+                        if (analysisMatch) {
+                            possibleChordsForFunction.push([ b.grado_detalle, `Extra (${b.analysis})`, b.weight || 1 ]);
+                        }
+                    });
+                    if (possibleChordsForFunction.length > 0) {
+                         const optionsWithWeights = possibleChordsForFunction.map(([degree, analysis, weight]) => [ { degree, analysis }, weight ]);
+                         const selected = weightedChoice(optionsWithWeights);
+                         if (selected) {
+                             degreeToAdd = selected.degree;
+                             analysisToAdd = selected.analysis;
+                         } else {
+                              // console.warn(`Weighted choice failed for function ${currentFunction}.`); // Less verbose
+                              degreeToAdd = 'N.C.';
+                              analysisToAdd = `Error Selección (${barIndex + 1}.${slotInBar + 1})`;
+                         }
+                    } else {
+                        // console.warn(`No chord options found for function '${currentFunction}' in scale '${scaleName}' (${keyType}).`); // Less verbose
+                        const tonicDegree = scaleDegreesInfo.find(d => d.function === 'T');
+                        if (tonicDegree) {
+                             degreeToAdd = `${tonicDegree.grado_base}${tonicDegree.quality || ''}`;
+                             analysisToAdd = `Fallback Tónica (${barIndex + 1}.${slotInBar + 1})`;
+                        } else {
+                             degreeToAdd = 'N.C.';
+                             analysisToAdd = `No Chord (${barIndex + 1}.${slotInBar + 1})`;
+                        }
+                    }
+                }
+                detailedProgression.push({ bar: barIndex + 1, slot: slotInBar + 1, absolute_slot: absSlotIdx, function: currentFunction, degree: degreeToAdd || 'N.C.', analysis: analysisToAdd });
+            }
+            return detailedProgression;
+        }
+
+        // Main Generation Function
+        function generateProgressionData(totalBars, scaleName, keyName, slotsPerBar, cadenceMode, cadenceNameSelect) {
+            // (Function content remains the same)
+            let errorMessage = null;
+            let detailedProgression = [];
+            let generatedDegreeProgressionString = "";
+            let generatedCadenceName = null;
+            try {
+                if (isNaN(totalBars) || totalBars < 2 || totalBars > 32) throw new Error("Número de compases debe ser entre 2 y 32.");
+                if (isNaN(slotsPerBar) || ![1, 2, 3, 4].includes(slotsPerBar)) throw new Error("Slots por compás debe ser 1, 2, 3 o 4.");
+                if (!scaleName || !SCALES_INFO[scaleName]) throw new Error(`Escala '${scaleName}' no válida.`);
+                if (!keyName || !VALID_KEYS_EXAMPLE.includes(keyName)) throw new Error(`Tonalidad '${keyName}' no válida.`);
+                if (!['random', 'select'].includes(cadenceMode)) throw new Error("Modo de cadencia no válido.");
+                const availableCadences = Object.keys(CADENCE_DEGREES);
+                if (availableCadences.length === 0) throw new Error("No hay cadencias definidas.");
+                if (cadenceMode === 'random') {
+                    generatedCadenceName = availableCadences[Math.floor(Math.random() * availableCadences.length)];
+                } else {
+                    if (!cadenceNameSelect || !CADENCE_DEGREES[cadenceNameSelect]) {
+                        throw new Error(`Cadencia seleccionada '${cadenceNameSelect}' no válida.`);
+                    }
+                    generatedCadenceName = cadenceNameSelect;
+                }
+                const functionalStructure = generateFunctionalBackbone(totalBars, generatedCadenceName);
+                if (!functionalStructure || functionalStructure.length !== totalBars) {
+                     throw new Error("Error al generar la estructura funcional.");
+                }
+                detailedProgression = generateChordsLayer2( functionalStructure, totalBars, generatedCadenceName, scaleName, keyName, slotsPerBar );
+                 const expectedSlots = totalBars * slotsPerBar;
+                 if (!detailedProgression || detailedProgression.length !== expectedSlots) {
+                     if (detailedProgression && detailedProgression.length > 0 && detailedProgression.length < expectedSlots) {
+                         // console.warn(`Detailed progression slightly short (${detailedProgression.length}/${expectedSlots}). Padding.`); // Less verbose
+                         const lastChord = detailedProgression[detailedProgression.length - 1];
+                         while(detailedProgression.length < expectedSlots) {
+                             detailedProgression.push({ bar: Math.floor(detailedProgression.length / slotsPerBar) + 1, slot: (detailedProgression.length % slotsPerBar) + 1, absolute_slot: detailedProgression.length, function: lastChord.function, degree: 'N.C.', analysis: 'Padding' });
+                         }
+                     } else {
+                         // console.error("Detailed progression generation failed.", { expected: expectedSlots, got: detailedProgression ? detailedProgression.length : 0, functionalStructure: functionalStructure, params: { totalBars, cadenceName, scaleName, keyName, slotsPerBar } }); // Less verbose
+                         throw new Error(`Error al generar la progresión detallada. Slots esperados: ${expectedSlots}, obtenidos: ${detailedProgression ? detailedProgression.length : 0}`);
+                     }
+                 }
+                generatedDegreeProgressionString = detailedProgression.map(d => d.degree).join(' ');
+            } catch (e) {
+                // console.error("Generation Error:", e); // Less verbose
+                errorMessage = e.message || "Ocurrió un error inesperado durante la generación.";
+            }
+            return { detailedProgression, generatedDegreeProgressionString, generatedCadenceName, errorMessage };
+        }
+
+
+        // --- MIDI Generation Function Removed ---
+        // function generateAndDownloadMidi(...) { ... }
+
+
+        // --- Event Listeners ---
+
+        // Generate Button Listener (remains the same)
+        generateButton.addEventListener('click', () => {
+            try {
+                const totalBars = parseInt(totalBarsInput.value, 10);
+                const slotsPerBar = parseInt(slotsPerBarSelect.value, 10);
+                const scaleName = scaleNameSelect.value;
+                const keyName = keyNameSelect.value;
+                const cadenceMode = document.querySelector('input[name="cadence-mode"]:checked').value;
+                const cadenceNameSelected = (cadenceMode === 'select' && cadenceSelectContainer.style.display !== 'none') ? cadenceNameSelect.value : null;
+
+                const { detailedProgression, generatedDegreeProgressionString, generatedCadenceName, errorMessage } =
+                    generateProgressionData(totalBars, scaleName, keyName, slotsPerBar, cadenceMode, cadenceNameSelected);
+
+                if (errorMessage) {
+                    showMessage(errorMessage, 'error');
+                    generatedDegreeProgressionDiv.textContent = '';
+                    chordProgressionOutputTextarea.value = '';
+                    lastDetailedProgression = [];
+                    lastGeneratedSlotsPerBar = null;
+                } else {
+                    generatedDegreeProgressionDiv.textContent = generatedDegreeProgressionString;
+                    chordProgressionOutputTextarea.value = '';
+                    lastGeneratedKey = keyName;
+                    lastGeneratedScale = scaleName;
+                    lastGeneratedSlotsPerBar = slotsPerBar;
+                    lastDetailedProgression = detailedProgression;
+                    showMessage(`Progresión generada con cadencia: ${generatedCadenceName}`, 'info');
+                    const transposedInitial = transposeProgression(generatedDegreeProgressionString, keyName);
+                    chordProgressionOutputTextarea.value = transposedInitial;
+                }
+            } catch (e) {
+                showMessage(`Error en la interfaz: ${e.message}`, 'error');
+                // console.error("UI Error on Generate:", e); // Less verbose
+                lastGeneratedSlotsPerBar = null;
+            }
+        });
+
+        // Transpose Button Listener (remains the same)
+        transposeButton.addEventListener('click', () => {
+            const degreeProgression = generatedDegreeProgressionDiv.textContent;
+            const targetKey = transposeKeySelect.value;
+            if (!degreeProgression) {
+                showMessage("Primero genera una progresión en grados.", 'warning'); return;
+            }
+            if (!targetKey) {
+                 showMessage("Selecciona una tonalidad para transponer.", 'warning'); return;
+            }
+            const transposedResult = transposeProgression(degreeProgression, targetKey);
+             if (!transposedResult.startsWith("Error:")) {
+                 chordProgressionOutputTextarea.value = transposedResult;
+                 showMessage(`Progresión transpuesta a ${targetKey}.`, 'info');
+             }
+        });
+
+        // Cadence Mode Change Listener (remains the same)
+        cadenceModeRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                if (event.target.value === 'select') {
+                    cadenceSelectContainer.style.display = 'block';
+                } else {
+                    cadenceSelectContainer.style.display = 'none';
+                }
+            });
+        });
+
+        // Close Message Box Button Listener (remains the same)
+        closeMessageBoxButton.addEventListener('click', hideMessage);
+
+
+        // --- Initialization ---
+        function initializeUI() {
+            // Populate Selects (remains the same)
+            Object.keys(SCALES_INFO).sort().forEach(name => {
+                const option = document.createElement('option'); option.value = name; option.textContent = name.charAt(0).toUpperCase() + name.slice(1); scaleNameSelect.appendChild(option);
+            });
+            if (scaleNameSelect.options.length > 0) scaleNameSelect.value = "jonico";
+            VALID_KEYS_EXAMPLE.forEach(key => {
+                const optionGen = document.createElement('option'); optionGen.value = key; optionGen.textContent = key; keyNameSelect.appendChild(optionGen);
+                const optionTrans = document.createElement('option'); optionTrans.value = key; optionTrans.textContent = key; transposeKeySelect.appendChild(optionTrans);
+            });
+             keyNameSelect.value = "C";
+             transposeKeySelect.value = "C";
+            Object.keys(CADENCE_DEGREES).sort().forEach(name => {
+                const option = document.createElement('option'); option.value = name; option.textContent = name.charAt(0).toUpperCase() + name.slice(1); cadenceNameSelect.appendChild(option);
+            });
+             if (cadenceNameSelect.options.length > 0) cadenceNameSelect.value = "autentica";
+
+            // Initial state for cadence select
+            if (document.querySelector('input[name="cadence-mode"]:checked').value !== 'select') {
+                 cadenceSelectContainer.style.display = 'none';
+            }
+
+             // Message box click listener (remains the same)
+             messageBox.addEventListener('click', (e) => { if (e.target === messageBox) hideMessage(); });
+
+             // Download MIDI Button listener removed
+             // downloadMidiButton.addEventListener('click', () => { ... });
+        }
+
+        // Run initialization when the DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeUI);
+
+    </script>
+
+</body>
+</html>
