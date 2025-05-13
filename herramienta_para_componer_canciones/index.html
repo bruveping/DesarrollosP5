@@ -895,24 +895,12 @@
 
 <h2>Strudel REPL Editor</h2>
 <div id="strudelContainer">
-    <strudel-editor id="repl" placeholder="Escribe aquí tu poesía...">
-
-
-
-    </strudel-editor>
-    <button id="play" class="el_button">Play</button>
-    <button id="stop" class="el_button">Stop</button>
+  <button id="play" class="el_button">
+    <a href="https://strudel.cc/" target="_blank" rel="noopener noreferrer">
+      Probar musica en strudel
+    </a>
+  </button>
 </div>
-
-<script src="https://unpkg.com/@strudel/repl@latest"></script>
-<script>
-    window.onload = function() {
-        const repl = document.getElementById("repl");
-
-        document.getElementById("play").addEventListener("click", () => repl.editor.evaluate());
-        document.getElementById("stop").addEventListener("click", () => repl.editor.stop());
-    };
-</script>
 
 
 </body>
