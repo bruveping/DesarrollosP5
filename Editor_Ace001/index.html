@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACE CODE EDITOR - WipEout Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ext-language_tools.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ext-modelist.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ext-themelist.js"></script>
+    <style>
+        :root {
+            --primary-color: #00e5ff; /* Electric Cyan/Blue */
+            --secondary-color: #ff8c00; /* Bright Orange */
+            --background-color: #0A0F14; /* Very Dark Desaturated Blue */
+            --editor-background: #0D1217;
+            --text-color: #E0E0E0;
+            --button-bg: #18222B;
+            --button-hover-bg: #22303C;
+            --border-color: var(--primary-color);
+            --glow-color: var(--primary-color);
+            --input-bg: #10161D;
+        }
+
+        @font-face {
+            font-family: 'Orbitron';
+            src: url('https://fonts.gstatic.com/s/orbitron/v25/yMJRMIlzdpvBhQQL_Qq7dy0.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Orbitron', 'Consolas', 'Monaco', monospace;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.15) 50%
+            );
+            background-size: 100% 3px; /* Thinner scanlines */
+            z-index: 0; /* Behind content */
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px); /* Full height with padding */
+            width: calc(100vw - 40px); /* Full width with padding */
+            max-width: 1600px; /* Max width for large screens */
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--glow-color), inset 0 0 15px rgba(0, 229, 255, 0.3);
+            background-color: rgba(10, 15, 20, 0.85); /* Slightly transparent background */
+            backdrop-filter: blur(5px);
+            position: relative; /* For z-index stacking */
+            z-index: 1; /* Above scanlines */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: clamp(20px, 2.5vw, 28px); /* Responsive font size */
+            font-weight: 500; /* Orbitron medium */
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px var(--glow-color), 0 0 12px var(--glow-color);
+            text-transform: uppercase;
+            color: var(--primary-color);
+        }
+        .header h1 .alt-color {
+            color: var(--secondary-color);
+            text-shadow: 0 0 8px var(--secondary-color), 0 0 12px var(--secondary-color);
+        }
+
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 15px;
+            align-items: end; 
+            flex-shrink: 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column; 
+            gap: 6px; 
+        }
+        .control-group label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            margin-bottom: 2px; 
+        }
+
+
+        .input-retro, .select-retro {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 9px 12px; 
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 100%;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        
+        .select-retro {
+            appearance: none; 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300e5ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px 10px;
+            padding-right: 30px; 
+        }
+
+
+        .input-retro:focus, .select-retro:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--glow-color);
+            border-color: var(--glow-color);
+        }
+
+        .slider-container { 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 9px 12px; 
+        }
+
+        .slider {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #333;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+            padding: 0; 
+            margin: 0; 
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--glow-color);
+            border: 2px solid var(--editor-background);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 12px; 
+            height: 12px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px var(--glow-color);
+            border: 2px solid var(--editor-background);
+        }
+
+        .slider-value {
+            font-size: 14px;
+            color: #ccc;
+            width: 45px;
+            text-align: right;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start; 
+            margin-top: 5px; 
+        }
+
+        .button-wip {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-family: 'Orbitron', 'Consolas', monospace;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+        }
+
+        .button-wip:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--primary-color);
+            box-shadow: 0 0 10px var(--glow-color), 0 0 5px var(--glow-color) inset;
+            transform: translateY(-1px);
+        }
+        .button-wip:active {
+            transform: translateY(0px);
+            box-shadow: 0 0 5px var(--glow-color);
+        }
+
+
+        .editor-area {
+            flex: 1; 
+            display: flex; 
+            min-height: 250px; 
+            margin-top: 15px; 
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+            border-radius: 6px;
+            overflow: hidden; 
+        }
+
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            font-size: 16px; 
+            line-height: 1.5;
+        }
+
+        .ace_editor {
+             background-color: var(--editor-background) !important;
+             color: var(--text-color) !important;
+        }
+        .ace_gutter {
+            background: #101820 !important; 
+            color: #667788 !important;
+        }
+        .ace_cursor {
+            color: var(--secondary-color) !important; 
+            border-left: 2px solid var(--secondary-color) !important;
+        }
+        .ace_selection {
+            background: rgba(0, 229, 255, 0.2) !important; 
+        }
+        .ace_active-line {
+            background: rgba(0, 229, 255, 0.05) !important;
+        }
+
+
+        .footer {
+            display: flex; /* Use flexbox for alignment */
+            justify-content: space-between; /* Space between items */
+            align-items: center; /* Vertically align items */
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #2a3f50;
+            font-size: 12px;
+            color: #777;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .cursor-status {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: var(--primary-color);
+            text-shadow: 0 0 3px var(--primary-color);
+            margin: 0; /* Remove default p margin */
+        }
+        .footer-text {
+            text-align: right; /* Align original footer text to the right */
+        }
+
+
+        .status-message {
+            position: fixed; 
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 229, 255, 0.9); 
+            color: var(--background-color); 
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 10000; 
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .status-message.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .status-message.error {
+            background-color: rgba(255, 100, 0, 0.9); 
+             box-shadow: 0 0 15px var(--secondary-color);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--editor-background);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="container">
+        <div class="header">
+            <h1><span class="alt-color">W</span>ip<span class="alt-color">E</span>out <span class="alt-color">C</span>ode <span class="alt-color">T</span>erminal</h1>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="languageFilter">Filtrar Lenguaje:</label>
+                <input type="text" id="languageFilter" class="input-retro" placeholder="Ej: javascript">
+            </div>
+            <div class="control-group">
+                <label for="languageSelect">Seleccionar Lenguaje:</label>
+                <select id="languageSelect" class="select-retro"></select>
+            </div>
+            <div class="control-group">
+                <label for="themeFilter">Filtrar Tema:</label>
+                <input type="text" id="themeFilter" class="input-retro" placeholder="Ej: monokai">
+            </div>
+            <div class="control-group">
+                <label for="themeSelect">Seleccionar Tema:</label>
+                <select id="themeSelect" class="select-retro"></select>
+            </div>
+            <div class="control-group">
+                <label for="fontSizeSlider">Tamaño Fuente:</label>
+                <div class="slider-container">
+                    <input type="range" min="6" max="120" value="16" class="slider" id="fontSizeSlider">
+                    <span id="fontSizeValue" class="slider-value">16px</span>
+                </div>
+            </div>
+        </div>
+        <div class="buttons-group">
+            <button id="clearBtn" class="button-wip">Limpiar</button>
+            <button id="copyBtn" class="button-wip">Copiar</button>
+            <button id="downloadBtn" class="button-wip">Descargar</button>
+            <button id="toggleWrapBtn" class="button-wip">Wrap: OFF</button>
+            <button id="toggleSuggestionsBtn" class="button-wip">Sugerencias: ON</button>
+            <button id="deleteMdBtn" class="button-wip" style="display: none;">Borrar MD</button>
+        </div>
+
+
+        <div class="editor-area">
+            <div class="editor-container">
+                <div id="editor">// Saludos, piloto de código!
+// Sistema ACE inicializado. Listo para la entrada.
+// Filtra lenguajes y temas arriba. Ajusta la fuente.
+// ¡Que tus algoritmos sean veloces y tu código elegante!
+
+function AG_Systems_Init() {
+    console.log("Anti-Gravity Systems Online.");
+    return "Ready to Race!";
+}
+AG_Systems_Init();
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p id="cursorPositionStatus" class="cursor-status">Línea: 1, Columna: 1</p>
+            <span class="footer-text">ACE Editor v1.32.6 // WipEout Fusion Design Protocol // Engaged</span>
+        </div>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <script>
+        // Initialize ACE Editor
+        ace.require("ace/ext/language_tools");
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/tomorrow_night_eighties"); 
+        editor.session.setMode("ace/mode/javascript");
+        editor.session.setUseWrapMode(false); 
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true,
+            showPrintMargin: false,
+            fontSize: "16px", 
+            fontFamily: "Consolas, 'Courier New', monospace", 
+            copyWithEmptySelection: true,
+        });
+
+        // DOM Elements
+        const languageFilterInput = document.getElementById("languageFilter");
+        const themeFilterInput = document.getElementById("themeFilter");
+        const languageSelect = document.getElementById("languageSelect");
+        const themeSelect = document.getElementById("themeSelect");
+        const fontSizeSlider = document.getElementById("fontSizeSlider");
+        const fontSizeValue = document.getElementById("fontSizeValue");
+        const clearBtn = document.getElementById("clearBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const deleteMdBtn = document.getElementById("deleteMdBtn");
+        const toggleWrapBtn = document.getElementById("toggleWrapBtn");
+        const toggleSuggestionsBtn = document.getElementById("toggleSuggestionsBtn");
+        const statusMessage = document.getElementById("statusMessage");
+        const cursorPositionStatus = document.getElementById("cursorPositionStatus"); // New element
+
+        // Language and Theme Data
+        const modelist = ace.require("ace/ext/modelist");
+        let availableModes = modelist.modes; 
+
+        if (!availableModes.some(mode => mode.name === "markdown")) {
+            availableModes.push({
+                name: "markdown",
+                caption: "Markdown",
+                mode: "ace/mode/markdown",
+                extensions: "md|markdown"
+            });
+        }
+        availableModes.sort((a, b) => a.caption.localeCompare(b.caption));
+
+
+        const themelist = ace.require("ace/ext/themelist");
+        let availableThemes = themelist.themes; 
+        availableThemes.sort((a,b) => a.caption.localeCompare(b.caption));
+
+
+        // Show Status Message
+        let statusTimeout;
+        function showStatus(message, isError = false) {
+            clearTimeout(statusTimeout);
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message active'; 
+            if (isError) {
+                statusMessage.classList.add('error');
+            }
+            statusTimeout = setTimeout(() => {
+                statusMessage.classList.remove('active');
+            }, 3000);
+        }
+
+        // --- Language Handling ---
+        function populateLanguageSelect() {
+            languageSelect.innerHTML = ''; 
+            availableModes.forEach(mode => {
+                const option = document.createElement("option");
+                option.value = mode.mode;
+                option.textContent = mode.caption;
+                languageSelect.appendChild(option);
+            });
+        }
+
+        languageFilterInput.addEventListener("input", function() {
+            const filterText = this.value.toLowerCase();
+            const matchedMode = availableModes.find(mode => mode.caption.toLowerCase().includes(filterText) || mode.name.toLowerCase().includes(filterText));
+            if (matchedMode) {
+                editor.session.setMode(matchedMode.mode);
+                languageSelect.value = matchedMode.mode; 
+                showStatus(`Lenguaje: ${matchedMode.caption}`);
+                updateDeleteMdButtonVisibility(matchedMode.name);
+            }
+        });
+        
+        languageSelect.addEventListener("change", function() {
+            const selectedModePath = this.value;
+            const selectedModeObj = availableModes.find(m => m.mode === selectedModePath);
+            if (selectedModeObj) {
+                editor.session.setMode(selectedModeObj.mode);
+                languageFilterInput.value = ''; 
+                languageFilterInput.placeholder = `Actual: ${selectedModeObj.caption}`;
+                showStatus(`Lenguaje: ${selectedModeObj.caption}`);
+                updateDeleteMdButtonVisibility(selectedModeObj.name);
+            }
+        });
+
+        // --- Theme Handling ---
+        function populateThemeSelect() {
+            themeSelect.innerHTML = ''; 
+            availableThemes.forEach(theme => {
+                const option = document.createElement("option");
+                option.value = theme.theme; 
+                option.textContent = theme.caption;
+                themeSelect.appendChild(option);
+            });
+        }
+
+        themeFilterInput.addEventListener("input", function() {
+            const filterText = this.value.toLowerCase();
+            const matchedTheme = availableThemes.find(theme => theme.caption.toLowerCase().includes(filterText) || theme.name.toLowerCase().includes(filterText));
+            if (matchedTheme) {
+                editor.setTheme(matchedTheme.theme);
+                themeSelect.value = matchedTheme.theme; 
+                showStatus(`Tema: ${matchedTheme.caption}`);
+            }
+        });
+
+        themeSelect.addEventListener("change", function() {
+            const selectedThemePath = this.value;
+            const selectedThemeObj = availableThemes.find(t => t.theme === selectedThemePath);
+            if (selectedThemeObj) {
+                editor.setTheme(selectedThemeObj.theme);
+                themeFilterInput.value = ''; 
+                themeFilterInput.placeholder = `Actual: ${selectedThemeObj.caption}`;
+                showStatus(`Tema: ${selectedThemeObj.caption}`);
+            }
+        });
+
+
+        // --- Initial Population and State Sync ---
+        function initializeControls() {
+            populateLanguageSelect();
+            populateThemeSelect();
+
+            const initialModePath = editor.session.getMode().$id;
+            const initialModeObj = availableModes.find(m => m.mode === initialModePath);
+            if (initialModeObj) {
+                languageSelect.value = initialModeObj.mode;
+                languageFilterInput.placeholder = `Actual: ${initialModeObj.caption}`;
+                updateDeleteMdButtonVisibility(initialModeObj.name);
+            }
+
+            const initialThemePath = editor.getTheme();
+            const initialThemeObj = availableThemes.find(t => t.theme === initialThemePath);
+            if (initialThemeObj) {
+                themeSelect.value = initialThemePath; // Use initialThemePath directly as it's the correct value for the select
+                themeFilterInput.placeholder = `Actual: ${initialThemeObj.caption}`;
+            }
+
+
+            toggleWrapBtn.textContent = editor.session.getUseWrapMode() ? "Wrap: ON" : "Wrap: OFF";
+            
+            const suggestionsEnabled = editor.getOption("enableBasicAutocompletion");
+            toggleSuggestionsBtn.textContent = suggestionsEnabled ? "Sugerencias: ON" : "Sugerencias: OFF";
+
+            // Initial cursor position update
+            updateCursorPosition();
+        }
+        
+
+        // --- Editor Event Listeners ---
+        editor.session.on('changeStatus', function() { // More reliable for cursor position
+            updateCursorPosition();
+        });
+         editor.session.selection.on('changeCursor', function() { // Also listen to cursor change specifically
+            updateCursorPosition();
+        });
+
+
+        function updateCursorPosition() {
+            const pos = editor.getCursorPosition();
+            cursorPositionStatus.textContent = `Línea: ${pos.row + 1}, Columna: ${pos.column + 1}`;
+        }
+        
+        initializeControls(); // Call after all functions are defined
+
+
+        // Font Size Slider
+        fontSizeSlider.addEventListener("input", function() {
+            const size = this.value + "px";
+            editor.setFontSize(size);
+            fontSizeValue.textContent = size;
+        });
+        fontSizeSlider.addEventListener("change", function() { 
+             showStatus(`Tamaño de fuente: ${this.value}px`);
+        });
+
+        // Toggle Wrap Button
+        toggleWrapBtn.addEventListener("click", function() {
+            const currentWrapState = editor.session.getUseWrapMode();
+            editor.session.setUseWrapMode(!currentWrapState);
+            const newWrapState = editor.session.getUseWrapMode();
+            this.textContent = newWrapState ? "Wrap: ON" : "Wrap: OFF";
+            showStatus(`Ajuste de línea: ${newWrapState ? 'Activado' : 'Desactivado'}`);
+        });
+
+        // Toggle Suggestions Button
+        toggleSuggestionsBtn.addEventListener("click", function() {
+            const currentSuggestionsState = editor.getOption("enableBasicAutocompletion");
+            const newState = !currentSuggestionsState;
+            editor.setOptions({
+                enableBasicAutocompletion: newState,
+                enableSnippets: newState,
+                enableLiveAutocompletion: newState,
+            });
+            this.textContent = newState ? "Sugerencias: ON" : "Sugerencias: OFF";
+            showStatus(`Sugerencias de código: ${newState ? 'Activadas' : 'Desactivadas'}`);
+        });
+
+
+        // Clear Button
+        clearBtn.addEventListener("click", function() {
+            if (confirm("¿Confirmas borrado total del contenido del editor?")) {
+                editor.setValue("");
+                showStatus("Contenido del editor borrado.");
+            }
+        });
+
+        // Copy Button
+        copyBtn.addEventListener("click", function() {
+            const content = editor.getValue();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showStatus("¡Contenido copiado al portapapeles!");
+                }).catch(err => {
+                    console.error('Error al copiar: ', err);
+                    showStatus("Error al copiar. Revisa la consola.", true);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showStatus("Contenido copiado (método alternativo).");
+                } catch (err) {
+                    console.error('Error al copiar (fallback): ', err);
+                    showStatus("Error al copiar. Intenta manualmente.", true);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Download Button
+        downloadBtn.addEventListener("click", function() {
+            const content = editor.getValue();
+            const currentModePath = editor.session.getMode().$id;
+            const currentModeObj = availableModes.find(m => m.mode === currentModePath);
+            
+            let extension = ".txt";
+            let filename = "codigo";
+
+            if (currentModeObj) {
+                filename = currentModeObj.name.replace(/[^a-z0-9_.-]/gi, '_'); 
+                if (currentModeObj.extensions) {
+                    extension = "." + currentModeObj.extensions.split('|')[0];
+                }
+            }
+            
+            if (extension === ".txt") {
+                 const modeNameSimple = currentModePath.split('/').pop(); 
+                 const commonExtensions = {
+                    javascript: ".js", html: ".html", css: ".css", python: ".py", java: ".java",
+                    c_cpp: ".cpp", csharp: ".cs", ruby: ".rb", php: ".php", typescript: ".ts",
+                    markdown: ".md", json: ".json", xml: ".xml", sql: ".sql", golang: ".go",
+                    rust: ".rs", swift: ".swift", kotlin: ".kt", scala: ".scala", perl: ".pl"
+                 };
+                 if (commonExtensions[modeNameSimple]) {
+                    extension = commonExtensions[modeNameSimple];
+                 }
+            }
+
+            const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${filename}${extension}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            
+            showStatus(`Archivo ${filename}${extension} descargado.`);
+        });
+
+        // Markdown Delete Button Visibility
+        function updateDeleteMdButtonVisibility(modeName) {
+            if (modeName && modeName.toLowerCase() === 'markdown') {
+                deleteMdBtn.style.display = 'inline-block';
+            } else {
+                deleteMdBtn.style.display = 'none';
+            }
+        }
+      
+        // Delete Markdown Content Button
+        deleteMdBtn.addEventListener("click", function() {
+            const currentModePath = editor.session.getMode().$id;
+            const currentModeObj = availableModes.find(m => m.mode === currentModePath);
+            if (currentModeObj && currentModeObj.name.toLowerCase() === 'markdown') {
+                if (confirm("¿Borrar contenido Markdown? Esta acción es irreversible.")) {
+                    editor.setValue("");
+                    showStatus("Contenido Markdown borrado.");
+                }
+            } else {
+                showStatus("Esta acción es solo para Markdown.", true);
+            }
+        });
+        
+        // Ctrl+S for Download
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { 
+                e.preventDefault();
+                downloadBtn.click();
+            }
+        });
+
+        // Initial welcome message
+        showStatus("Terminal de Código WipEout: ¡Lista para la acción!");
+
+    </script>
+</body>
+</html>
