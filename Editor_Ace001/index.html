@@ -426,349 +426,328 @@ AG_Systems_Init();
     </div>
 
     <div id="statusMessage" class="status-message"></div>
+<script>
+        // Initialize ACE Editor
+        ace.require("ace/ext/language_tools");
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/tomorrow_night_eighties");
+        editor.session.setMode("ace/mode/javascript");
+        editor.session.setUseWrapMode(false); // Initial state set to false based on button text
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true,
+            showPrintMargin: false,
+            fontSize: "16px",
+            fontFamily: "Consolas, 'Courier New', monospace",
+            copyWithEmptySelection: true,
+        });
 
-    <script>
-        // Initialize ACE Editor
-        ace.require("ace/ext/language_tools");
-        const editor = ace.edit("editor");
-        editor.setTheme("ace/theme/tomorrow_night_eighties");
-        editor.session.setMode("ace/mode/javascript");
-        editor.session.setUseWrapMode(false);
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: true,
-            showPrintMargin: false,
-            fontSize: "16px",
-            fontFamily: "Consolas, 'Courier New', monospace",
-            copyWithEmptySelection: true,
-        });
+        // DOM Elements
+        const languageFilterInput = document.getElementById("languageFilter");
+        const themeFilterInput = document.getElementById("themeFilter");
+        const languageSelect = document.getElementById("languageSelect");
+        const themeSelect = document.getElementById("themeSelect");
+        const fontSizeSlider = document.getElementById("fontSizeSlider");
+        const fontSizeValue = document.getElementById("fontSizeValue");
+        const clearBtn = document.getElementById("clearBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        // const deleteMdBtn = document.getElementById("deleteMdBtn"); // Removed
+        const toggleWrapBtn = document.getElementById("toggleWrapBtn");
+        const toggleSuggestionsBtn = document.getElementById("toggleSuggestionsBtn");
+        const statusMessage = document.getElementById("statusMessage");
+        const cursorPositionStatus = document.getElementById("cursorPositionStatus"); // New element
+        const filenameInput = document.getElementById("filenameInput"); // Nuevo input para el nombre del archivo
 
-        // DOM Elements
-        const languageFilterInput = document.getElementById("languageFilter");
-        const themeFilterInput = document.getElementById("themeFilter");
-        const languageSelect = document.getElementById("languageSelect");
-        const themeSelect = document.getElementById("themeSelect");
-        const fontSizeSlider = document.getElementById("fontSizeSlider");
-        const fontSizeValue = document.getElementById("fontSizeValue");
-        const clearBtn = document.getElementById("clearBtn");
-        const copyBtn = document.getElementById("copyBtn");
-        const downloadBtn = document.getElementById("downloadBtn");
-        const deleteMdBtn = document.getElementById("deleteMdBtn");
-        const toggleWrapBtn = document.getElementById("toggleWrapBtn");
-        const toggleSuggestionsBtn = document.getElementById("toggleSuggestionsBtn");
-        const statusMessage = document.getElementById("statusMessage");
-        const cursorPositionStatus = document.getElementById("cursorPositionStatus"); // New element
-        const filenameInput = document.getElementById("filenameInput"); // Nuevo input para el nombre del archivo
+        // Variable para almacenar el nombre del archivo
+        let filename = filenameInput.value; // Inicializar con el valor por defecto del input
 
-        // Variable para almacenar el nombre del archivo
-        let filename = filenameInput.value; // Inicializar con el valor por defecto del input
+        // Language and Theme Data
+        const modelist = ace.require("ace/ext/modelist");
+        let availableModes = modelist.modes;
 
-        // Language and Theme Data
-        const modelist = ace.require("ace/ext/modelist");
-        let availableModes = modelist.modes;
-
-        if (!availableModes.some(mode => mode.name === "markdown")) {
-            availableModes.push({
-                name: "markdown",
-                caption: "Markdown",
-                mode: "ace/mode/markdown",
-                extensions: "md|markdown"
-            });
-        }
-        availableModes.sort((a, b) => a.caption.localeCompare(b.caption));
-
-
-        const themelist = ace.require("ace/ext/themelist");
-        let availableThemes = themelist.themes;
-        availableThemes.sort((a,b) => a.caption.localeCompare(b.caption));
+        // Add Markdown mode if not present (keeping this as it might be useful for mode selection)
+        if (!availableModes.some(mode => mode.name === "markdown")) {
+            availableModes.push({
+                name: "markdown",
+                caption: "Markdown",
+                mode: "ace/mode/markdown",
+                extensions: "md|markdown"
+            });
+        }
+        availableModes.sort((a, b) => a.caption.localeCompare(b.caption));
 
 
-        // Show Status Message
-        let statusTimeout;
-        function showStatus(message, isError = false) {
-            clearTimeout(statusTimeout);
-            statusMessage.textContent = message;
-            statusMessage.className = 'status-message active';
-            if (isError) {
-                statusMessage.classList.add('error');
-            }
-            statusTimeout = setTimeout(() => {
-                statusMessage.classList.remove('active');
-            }, 3000);
-        }
-
-        // --- Language Handling ---
-        function populateLanguageSelect() {
-            languageSelect.innerHTML = '';
-            availableModes.forEach(mode => {
-                const option = document.createElement("option");
-                option.value = mode.mode;
-                option.textContent = mode.caption;
-                languageSelect.appendChild(option);
-            });
-        }
-
-        languageFilterInput.addEventListener("input", function() {
-            const filterText = this.value.toLowerCase();
-            const matchedMode = availableModes.find(mode => mode.caption.toLowerCase().includes(filterText) || mode.name.toLowerCase().includes(filterText));
-            if (matchedMode) {
-                editor.session.setMode(matchedMode.mode);
-                languageSelect.value = matchedMode.mode;
-                showStatus(`Lenguaje: ${matchedMode.caption}`);
-                updateDeleteMdButtonVisibility(matchedMode.name);
-            }
-        });
-
-        languageSelect.addEventListener("change", function() {
-            const selectedModePath = this.value;
-            const selectedModeObj = availableModes.find(m => m.mode === selectedModePath);
-            if (selectedModeObj) {
-                editor.session.setMode(selectedModeObj.mode);
-                languageFilterInput.value = '';
-                languageFilterInput.placeholder = `Actual: ${selectedModeObj.caption}`;
-                showStatus(`Lenguaje: ${selectedModeObj.caption}`);
-                updateDeleteMdButtonVisibility(selectedModeObj.name);
-            }
-        });
-
-        // --- Theme Handling ---
-        function populateThemeSelect() {
-            themeSelect.innerHTML = '';
-            availableThemes.forEach(theme => {
-                const option = document.createElement("option");
-                option.value = theme.theme;
-                option.textContent = theme.caption;
-                themeSelect.appendChild(option);
-            });
-        }
-
-        themeFilterInput.addEventListener("input", function() {
-            const filterText = this.value.toLowerCase();
-            const matchedTheme = availableThemes.find(theme => theme.caption.toLowerCase().includes(filterText) || theme.name.toLowerCase().includes(filterText));
-            if (matchedTheme) {
-                editor.setTheme(matchedTheme.theme);
-                themeSelect.value = matchedTheme.theme;
-                showStatus(`Tema: ${matchedTheme.caption}`);
-            }
-        });
-
-        themeSelect.addEventListener("change", function() {
-            const selectedThemePath = this.value;
-            const selectedThemeObj = availableThemes.find(t => t.theme === selectedThemePath);
-            if (selectedThemeObj) {
-                editor.setTheme(selectedThemeObj.theme);
-                themeFilterInput.value = '';
-                themeFilterInput.placeholder = `Actual: ${selectedThemeObj.caption}`;
-                showStatus(`Tema: ${selectedThemeObj.caption}`);
-            }
-        });
+        const themelist = ace.require("ace/ext/themelist");
+        let availableThemes = themelist.themes;
+        availableThemes.sort((a,b) => a.caption.localeCompare(b.caption));
 
 
-        // --- Initial Population and State Sync ---
-        function initializeControls() {
-            populateLanguageSelect();
-            populateThemeSelect();
+        // Show Status Message
+        let statusTimeout;
+        function showStatus(message, isError = false) {
+            clearTimeout(statusTimeout);
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message active';
+            if (isError) {
+                statusMessage.classList.add('error');
+            }
+            statusTimeout = setTimeout(() => {
+                statusMessage.classList.remove('active');
+            }, 3000);
+        }
 
-            const initialModePath = editor.session.getMode().$id;
-            const initialModeObj = availableModes.find(m => m.mode === initialModePath);
-            if (initialModeObj) {
-                languageSelect.value = initialModeObj.mode;
-                languageFilterInput.placeholder = `Actual: ${initialModeObj.caption}`;
-                updateDeleteMdButtonVisibility(initialModeObj.name);
-            }
+        // --- Language Handling ---
+        function populateLanguageSelect() {
+            languageSelect.innerHTML = '';
+            availableModes.forEach(mode => {
+                const option = document.createElement("option");
+                option.value = mode.mode;
+                option.textContent = mode.caption;
+                languageSelect.appendChild(option);
+            });
+        }
 
-            const initialThemePath = editor.getTheme();
-            const initialThemeObj = availableThemes.find(t => t.theme === initialThemePath);
-            if (initialThemeObj) {
-                themeSelect.value = initialThemePath; // Use initialThemePath directly as it's the correct value for the select
-                themeFilterInput.placeholder = `Actual: ${initialThemeObj.caption}`;
-            }
+        languageFilterInput.addEventListener("input", function() {
+            const filterText = this.value.toLowerCase();
+            const matchedMode = availableModes.find(mode => mode.caption.toLowerCase().includes(filterText) || mode.name.toLowerCase().includes(filterText));
+            if (matchedMode) {
+                editor.session.setMode(matchedMode.mode);
+                languageSelect.value = matchedMode.mode;
+                showStatus(`Lenguaje: ${matchedMode.caption}`);
+                // updateDeleteMdButtonVisibility(matchedMode.name); // Removed call
+            }
+        });
 
+        languageSelect.addEventListener("change", function() {
+            const selectedModePath = this.value;
+            const selectedModeObj = availableModes.find(m => m.mode === selectedModePath);
+            if (selectedModeObj) {
+                editor.session.setMode(selectedModeObj.mode);
+                languageFilterInput.value = '';
+                languageFilterInput.placeholder = `Actual: ${selectedModeObj.caption}`;
+                showStatus(`Lenguaje: ${selectedModeObj.caption}`);
+                // updateDeleteMdButtonVisibility(selectedModeObj.name); // Removed call
+            }
+        });
 
-            toggleWrapBtn.textContent = editor.session.getUseWrapMode() ? "Wrap: ON" : "Wrap: OFF";
+        // --- Theme Handling ---
+        function populateThemeSelect() {
+            themeSelect.innerHTML = '';
+            availableThemes.forEach(theme => {
+                const option = document.createElement("option");
+                option.value = theme.theme;
+                option.textContent = theme.caption;
+                themeSelect.appendChild(option);
+            });
+        }
 
-            const suggestionsEnabled = editor.getOption("enableBasicAutocompletion");
-            toggleSuggestionsBtn.textContent = suggestionsEnabled ? "Sugerencias: ON" : "Sugerencias: OFF";
+        themeFilterInput.addEventListener("input", function() {
+            const filterText = this.value.toLowerCase();
+            const matchedTheme = availableThemes.find(theme => theme.caption.toLowerCase().includes(filterText) || theme.name.toLowerCase().includes(filterText));
+            if (matchedTheme) {
+                editor.setTheme(matchedTheme.theme);
+                themeSelect.value = matchedTheme.theme;
+                showStatus(`Tema: ${matchedTheme.caption}`);
+            }
+        });
 
-            // Initial cursor position update
-            updateCursorPosition();
-        }
-
-
-        // --- Editor Event Listeners ---
-        editor.session.on('changeStatus', function() { // More reliable for cursor position
-            updateCursorPosition();
-        });
-         editor.session.selection.on('changeCursor', function() { // Also listen to cursor change specifically
-            updateCursorPosition();
-        });
-
-
-        function updateCursorPosition() {
-            const pos = editor.getCursorPosition();
-            cursorPositionStatus.textContent = `Línea: ${pos.row + 1}, Columna: ${pos.column + 1}`;
-        }
-
-        initializeControls(); // Call after all functions are defined
-
-
-        // Font Size Slider
-        fontSizeSlider.addEventListener("input", function() {
-            const size = this.value + "px";
-            editor.setFontSize(size);
-            fontSizeValue.textContent = size;
-        });
-        fontSizeSlider.addEventListener("change", function() {
-             showStatus(`Tamaño de fuente: ${this.value}px`);
-        });
-
-        // Toggle Wrap Button
-        toggleWrapBtn.addEventListener("click", function() {
-            const currentWrapState = editor.session.getUseWrapMode();
-            editor.session.setUseWrapMode(!currentWrapState);
-            const newWrapState = editor.session.getUseWrapMode();
-            this.textContent = newWrapState ? "Wrap: ON" : "Wrap: OFF";
-            showStatus(`Ajuste de línea: ${newWrapState ? 'Activado' : 'Desactivado'}`);
-        });
-
-        // Toggle Suggestions Button
-        toggleSuggestionsBtn.addEventListener("click", function() {
-            const currentSuggestionsState = editor.getOption("enableBasicAutocompletion");
-            const newState = !currentSuggestionsState;
-            editor.setOptions({
-                enableBasicAutocompletion: newState,
-                enableSnippets: newState,
-                enableLiveAutocompletion: newState,
-            });
-            this.textContent = newState ? "Sugerencias: ON" : "Sugerencias: OFF";
-            showStatus(`Sugerencias de código: ${newState ? 'Activadas' : 'Desactivadas'}`);
-        });
-
-
-        // Clear Button
-        clearBtn.addEventListener("click", function() {
-            if (confirm("¿Confirmas borrado total del contenido del editor?")) {
-                editor.setValue("");
-                showStatus("Contenido del editor borrado.");
-            }
-        });
-
-        // Copy Button
-        copyBtn.addEventListener("click", function() {
-            const content = editor.getValue();
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(content).then(() => {
-                    showStatus("¡Contenido copiado al portapapeles!");
-                }).catch(err => {
-                    console.error('Error al copiar: ', err);
-                    showStatus("Error al copiar. Revisa la consola.", true);
-                });
-            } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = content;
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showStatus("Contenido copiado (método alternativo).");
-                } catch (err) {
-                    console.error('Error al copiar (fallback): ', err);
-                    showStatus("Error al copiar. Intenta manualmente.", true);
-                }
-                document.body.removeChild(textArea);
-            }
-        });
-
-        // Download Button
-        downloadBtn.addEventListener("click", function() {
-            const content = editor.getValue();
-            const currentModePath = editor.session.getMode().$id;
-            const currentModeObj = availableModes.find(m => m.mode === currentModePath);
-
-            // Usar el nombre del archivo del input
-            let currentFilename = filenameInput.value.trim();
-            if (currentFilename === "") {
-                currentFilename = "codigo"; // Fallback si el input está vacío
-            }
-
-            let extension = ".txt";
-            if (currentModeObj) {
-                 if (currentModeObj.extensions) {
-                    extension = "." + currentModeObj.extensions.split('|')[0];
-                 }
-            }
-
-             // Mejorar la extensión si es .txt y hay una extensión común para el modo
-             if (extension === ".txt") {
-                  const modeNameSimple = currentModePath.split('/').pop();
-                  const commonExtensions = {
-                      javascript: ".js", html: ".html", css: ".css", python: ".py", java: ".java",
-                      c_cpp: ".cpp", csharp: ".cs", ruby: ".rb", php: ".php", typescript: ".ts",
-                      markdown: ".md", json: ".json", xml: ".xml", sql: ".sql", golang: ".go",
-                      rust: ".rs", swift: ".swift", kotlin: ".kt", scala: ".scala", perl: ".pl"
-                  };
-                  if (commonExtensions[modeNameSimple]) {
-                      extension = commonExtensions[modeNameSimple];
-                  }
-             }
+        themeSelect.addEventListener("change", function() {
+            const selectedThemePath = this.value;
+            const selectedThemeObj = availableThemes.find(t => t.theme === selectedThemePath);
+            if (selectedThemeObj) {
+                editor.setTheme(selectedThemeObj.theme);
+                themeFilterInput.value = '';
+                themeFilterInput.placeholder = `Actual: ${selectedThemeObj.caption}`;
+                showStatus(`Tema: ${selectedThemeObj.caption}`);
+            }
+        });
 
 
-            const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = `${currentFilename}${extension}`; // Usar el nombre del input + extensión
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
+        // --- Initial Population and State Sync ---
+        function initializeControls() {
+            populateLanguageSelect();
+            populateThemeSelect();
 
-            showStatus(`Archivo ${currentFilename}${extension} descargado.`);
-        });
+            const initialModePath = editor.session.getMode().$id;
+            const initialModeObj = availableModes.find(m => m.mode === initialModePath);
+            if (initialModeObj) {
+                languageSelect.value = initialModeObj.mode;
+                languageFilterInput.placeholder = `Actual: ${initialModeObj.caption}`;
+                // updateDeleteMdButtonVisibility(initialModeObj.name); // Removed call
+            }
 
-        // Markdown Delete Button Visibility
-        function updateDeleteMdButtonVisibility(modeName) {
-            if (modeName && modeName.toLowerCase() === 'markdown') {
-                deleteMdBtn.style.display = 'inline-block';
-            } else {
-                deleteMdBtn.style.display = 'none';
-            }
-        }
-
-        // Delete Markdown Content Button
-        deleteMdBtn.addEventListener("click", function() {
-            const currentModePath = editor.session.getMode().$id;
-            const currentModeObj = availableModes.find(m => m.mode === currentModePath);
-            if (currentModeObj && currentModeObj.name.toLowerCase() === 'markdown') {
-                if (confirm("¿Borrar contenido Markdown? Esta acción es irreversible.")) {
-                    editor.setValue("");
-                    showStatus("Contenido Markdown borrado.");
-                }
-            } else {
-                showStatus("Esta acción es solo para Markdown.", true);
-            }
-        });
-
-        // Ctrl+S for Download
-        document.addEventListener("keydown", function(e) {
-            if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
-                e.preventDefault();
-                downloadBtn.click();
-            }
-        });
-
-        // Event listener para actualizar la variable filename al escribir en el input
-        filenameInput.addEventListener('input', function() {
-            filename = this.value; // Actualiza la variable filename
-            // No necesitamos un display separado ya que el input mismo muestra el nombre
-            console.log(`Filename updated to: ${filename}`); // Opcional: para ver en consola
-        });
+            const initialThemePath = editor.getTheme();
+            const initialThemeObj = availableThemes.find(t => t.theme === initialThemePath);
+            if (initialThemeObj) {
+                themeSelect.value = initialThemePath; // Use initialThemePath directly as it's the correct value for the select
+                themeFilterInput.placeholder = `Actual: ${initialThemeObj.caption}`;
+            }
 
 
-        // Initial welcome message
-        showStatus("Terminal de Código WipEout: ¡Lista para la acción!");
+            toggleWrapBtn.textContent = editor.session.getUseWrapMode() ? "Wrap: ON" : "Wrap: OFF";
 
-    </script>
-</body>
+            const suggestionsEnabled = editor.getOption("enableBasicAutocompletion");
+            toggleSuggestionsBtn.textContent = suggestionsEnabled ? "Sugerencias: ON" : "Sugerencias: OFF";
+
+            // Initial cursor position update
+            updateCursorPosition();
+        }
+
+
+        // --- Editor Event Listeners ---
+        editor.session.on('changeStatus', function() { // More reliable for cursor position
+            updateCursorPosition();
+        });
+         editor.session.selection.on('changeCursor', function() { // Also listen to cursor change specifically
+            updateCursorPosition();
+        });
+
+
+        function updateCursorPosition() {
+            const pos = editor.getCursorPosition();
+            cursorPositionStatus.textContent = `Línea: ${pos.row + 1}, Columna: ${pos.column + 1}`;
+        }
+
+        initializeControls(); // Call after all functions are defined
+
+
+        // Font Size Slider
+        fontSizeSlider.addEventListener("input", function() {
+            const size = this.value + "px";
+            editor.setFontSize(size);
+            fontSizeValue.textContent = size;
+        });
+        fontSizeSlider.addEventListener("change", function() {
+             showStatus(`Tamaño de fuente: ${this.value}px`);
+        });
+
+        // Toggle Wrap Button
+        toggleWrapBtn.addEventListener("click", function() {
+            const currentWrapState = editor.session.getUseWrapMode();
+            const newState = !currentWrapState; // Invert the current state
+            editor.session.setUseWrapMode(newState); // Set the new state
+            this.textContent = newState ? "Wrap: ON" : "Wrap: OFF"; // Update button text
+            showStatus(`Ajuste de línea: ${newState ? 'Activado' : 'Desactivado'}`); // Update status message
+        });
+
+
+        // Toggle Suggestions Button
+        toggleSuggestionsBtn.addEventListener("click", function() {
+            const currentSuggestionsState = editor.getOption("enableBasicAutocompletion");
+            const newState = !currentSuggestionsState;
+            editor.setOptions({
+                enableBasicAutocompletion: newState,
+                enableSnippets: newState,
+                enableLiveAutocompletion: newState,
+            });
+            this.textContent = newState ? "Sugerencias: ON" : "Sugerencias: OFF";
+            showStatus(`Sugerencias de código: ${newState ? 'Activadas' : 'Desactivadas'}`);
+        });
+
+
+        // Clear Button
+        clearBtn.addEventListener("click", function() {
+            if (confirm("¿Confirmas borrado total del contenido del editor?")) {
+                editor.setValue("");
+                showStatus("Contenido del editor borrado.");
+            }
+        });
+
+        // Copy Button
+        copyBtn.addEventListener("click", function() {
+            const content = editor.getValue();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showStatus("¡Contenido copiado al portapapeles!");
+                }).catch(err => {
+                    console.error('Error al copiar: ', err);
+                    showStatus("Error al copiar. Revisa la consola.", true);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showStatus("Contenido copiado (método alternativo).");
+                } catch (err) {
+                    console.error('Error al copiar (fallback): ', err);
+                    showStatus("Error al copiar. Intenta manualmente.", true);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Download Button
+        downloadBtn.addEventListener("click", function() {
+            const content = editor.getValue();
+            const currentModePath = editor.session.getMode().$id;
+            const currentModeObj = availableModes.find(m => m.mode === currentModePath);
+
+            // Usar el nombre del archivo del input
+            let currentFilename = filenameInput.value.trim();
+            if (currentFilename === "") {
+                currentFilename = "codigo"; // Fallback si el input está vacío
+            }
+
+            let extension = ".txt";
+            if (currentModeObj) {
+                 if (currentModeObj.extensions) {
+                    extension = "." + currentModeObj.extensions.split('|')[0];
+                 }
+            }
+
+             // Mejorar la extensión si es .txt y hay una extensión común para el modo
+             if (extension === ".txt") {
+                  const modeNameSimple = currentModePath.split('/').pop();
+                  const commonExtensions = {
+                      javascript: ".js", html: ".html", css: ".css", python: ".py", java: ".java",
+                      c_cpp: ".cpp", csharp: ".cs", ruby: ".rb", php: ".php", typescript: ".ts",
+                      markdown: ".md", json: ".json", xml: ".xml", sql: ".sql", golang: ".go",
+                      rust: ".rs", swift: ".swift", kotlin: ".kt", scala: ".scala", perl: ".pl"
+                  };
+                  if (commonExtensions[modeNameSimple]) {
+                      extension = commonExtensions[modeNameSimple];
+                  }
+             }
+
+
+            const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${currentFilename}${extension}`; // Usar el nombre del input + extensión
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+
+            showStatus(`Archivo ${currentFilename}${extension} descargado.`);
+        });
+
+
+        // Ctrl+S for Download
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+                e.preventDefault();
+                downloadBtn.click();
+            }
+        });
+
+        // Event listener para actualizar la variable filename al escribir en el input
+        filenameInput.addEventListener('input', function() {
+            filename = this.value; // Actualiza la variable filename
+            // No necesitamos un display separado ya que el input mismo muestra el nombre
+            console.log(`Filename updated to: ${filename}`); // Opcional: para ver en consola
+        });
+
+
+        // Initial welcome message
+        showStatus("Terminal de Código WipEout: ¡Lista para la acción!");
+
+    </script>
+   </body>
 </html>
