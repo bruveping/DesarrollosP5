@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wipeout Text Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.33.0/ext-modelist.js"></script>
+    <style>
+        body {
+            background-color: #0a0a1f; /* Azul oscuro profundo */
+            color: #00ffcc; /* Cian neón */
+            font-family: 'Press Start 2P', cursive;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Evitar scrollbars en el body */
+        }
+
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap; /* Permitir que los controles se ajusten en pantallas pequeñas */
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #1a1a3f; /* Azul oscuro ligeramente más claro */
+            border-bottom: 3px solid #ff00ff; /* Rosa neón */
+            box-shadow: 0 0 15px #ff00ff;
+        }
+
+        .control-item {
+            margin-right: 12px;
+            margin-bottom: 8px; /* Espacio si los controles se envuelven */
+            display: flex; /* Para alinear label y control */
+            align-items: center; /* Para alinear label y control */
+        }
+
+        .control-item label {
+            font-size: 10px;
+            margin-right: 5px;
+            color: #ffff00; /* Amarillo neón */
+            white-space: nowrap; /* Evitar que la etiqueta se rompa */
+        }
+
+        input[type="text"],
+        select,
+        input[type="range"] {
+            background-color: #2a2a4f; /* Azul oscuro para inputs */
+            border: 1px solid #00ffff; /* Cian neón para bordes */
+            color: #00ffcc; /* Cian neón para texto */
+            padding: 6px 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 5px #00ffff;
+            outline: none;
+        }
+        
+        input[type="text"]::placeholder {
+            color: #00cc99;
+            opacity: 0.7;
+        }
+
+        select {
+            min-width: 150px; /* Ancho mínimo para el selector de lenguaje */
+        }
+
+        input[type="range"] {
+            padding: 0; /* Quitar padding extra del range */
+            height: 10px; /* Altura del slider */
+            cursor: pointer;
+            min-width: 80px; /* Ancho mínimo para el slider */
+        }
+        /* Estilos específicos para el track del slider (Chrome, Edge, Safari) */
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: #00ffff;
+            height: 4px;
+            border-radius: 2px;
+        }
+        /* Estilos específicos para el thumb del slider (Chrome, Edge, Safari) */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Quitar apariencia por defecto */
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ff00ff; /* Rosa neón para el thumb */
+            border-radius: 50%;
+            border: 1px solid #ffff00; /* Borde amarillo neón */
+            margin-top: -4px; /* Centrar el thumb verticalmente */
+            box-shadow: 0 0 5px #ff00ff;
+        }
+        /* Estilos específicos para el track del slider (Firefox) */
+        input[type="range"]::-moz-range-track {
+            background: #00ffff;
+            height: 4px;
+            border-radius: 2px;
+        }
+        /* Estilos específicos para el thumb del slider (Firefox) */
+        input[type="range"]::-moz-range-thumb {
+            width: 10px;
+            height: 10px;
+            background: #ff00ff;
+            border-radius: 50%;
+            border: 1px solid #ffff00;
+            box-shadow: 0 0 5px #ff00ff;
+            cursor: pointer;
+        }
+
+
+        #font-size-value {
+            font-size: 10px;
+            color: #00ffcc; /* Cian neón */
+            margin-left: 8px;
+            min-width: 25px; /* Espacio para "140px" */
+            text-align: right;
+        }
+
+
+        button {
+            background-color: #ff00ff; /* Rosa neón */
+            color: #0a0a1f; /* Texto oscuro para contraste */
+            border: none;
+            padding: 7px 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 8px #ff00ff, inset 0 0 5px #ffffff40;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #00ffff; /* Cian neón al pasar el ratón */
+            color: #0a0a1f;
+            box-shadow: 0 0 12px #00ffff, inset 0 0 8px #00000060;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #editor {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%; /* Asegura que el editor use el espacio asignado */
+        }
+
+        .ace_editor {
+            font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace !important; /* Fuente estándar para código */
+            /* font-size es manejado por JS ahora */
+        }
+        
+        /* Estilo para el mensaje de notificación */
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff00ff;
+            color: #0a0a1f;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+
+        #notification.show {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="controls-container">
+        <div class="control-item">
+            <label for="filename">Nombre:</label>
+            <input type="text" id="filename" placeholder="archivo.md">
+        </div>
+        <div class="control-item">
+            <label for="language-select">Lenguaje:</label>
+            <select id="language-select"></select>
+        </div>
+        <div class="control-item">
+            <label for="font-size-slider">Fuente:</label>
+            <input type="range" id="font-size-slider" min="8" max="140" value="14">
+            <span id="font-size-value">14px</span>
+        </div>
+        <div class="control-item">
+            <button id="copy-button">Copiar</button>
+        </div>
+        <div class="control-item">
+            <button id="download-button">Descargar</button>
+        </div>
+    </div>
+
+    <div id="editor"></div>
+    <div id="notification"></div>
+
+    <script>
+        // Inicializar el editor ACE
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/twilight"); // Tema oscuro solicitado
+        editor.session.setMode("ace/mode/markdown"); // Lenguaje predeterminado
+        editor.session.setUseWrapMode(true); // Activar ajuste de línea
+        
+        const initialFontSize = 14;
+        editor.setFontSize(initialFontSize + "px"); // Tamaño de fuente inicial para el contenido del editor
+
+        // Elementos del DOM
+        const filenameInput = document.getElementById('filename');
+        const languageSelect = document.getElementById('language-select');
+        const copyButton = document.getElementById('copy-button');
+        const downloadButton = document.getElementById('download-button');
+        const notification = document.getElementById('notification');
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        const fontSizeValueSpan = document.getElementById('font-size-value');
+
+        // Establecer valor inicial del slider y span
+        fontSizeSlider.value = initialFontSize;
+        fontSizeValueSpan.textContent = initialFontSize + "px";
+
+        // Cargar lista de lenguajes
+        var modelist = ace.require("ace/ext/modelist");
+        var modes = modelist.modes; // Array de todos los modos
+        
+        modes.forEach(function(mode) {
+            var option = document.createElement('option');
+            option.value = mode.name; // e.g., "javascript"
+            option.textContent = mode.caption; // e.g., "JavaScript"
+            languageSelect.appendChild(option);
+        });
+
+        // Establecer Markdown como seleccionado por defecto
+        languageSelect.value = 'markdown';
+
+        // Cambiar modo del editor al seleccionar lenguaje
+        languageSelect.addEventListener('change', function() {
+            const selectedModeName = this.value;
+            editor.session.setMode("ace/mode/" + selectedModeName);
+            
+            const selectedMode = modelist.modesByName[selectedModeName];
+            if (selectedMode && selectedMode.extensions) {
+                const mainExtension = selectedMode.extensions.split('|')[0];
+                filenameInput.placeholder = `archivo.${mainExtension}`;
+                if (filenameInput.value === "" || filenameInput.value.startsWith("archivo.")) {
+                     filenameInput.value = `archivo.${mainExtension}`;
+                }
+            } else {
+                filenameInput.placeholder = 'archivo.txt';
+                 if (filenameInput.value === "" || filenameInput.value.startsWith("archivo.")) {
+                    filenameInput.value = 'archivo.txt';
+                 }
+            }
+        });
+        
+        languageSelect.dispatchEvent(new Event('change'));
+
+        // Event listener para el slider de tamaño de fuente
+        fontSizeSlider.addEventListener('input', function() {
+            const newSize = this.value;
+            editor.setFontSize(newSize + "px");
+            fontSizeValueSpan.textContent = newSize + "px";
+        });
+
+
+        // Función para mostrar notificaciones
+        function showNotification(message, duration = 2000) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        // Botón de copiar
+        copyButton.addEventListener('click', function() {
+            const content = editor.getValue();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content)
+                    .then(() => {
+                        showNotification('¡Copiado al portapapeles!');
+                    })
+                    .catch(err => {
+                        showNotification('Error al copiar: ' + err, 3000);
+                        console.error('Error al copiar:', err);
+                    });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('¡Copiado al portapapeles! (fallback)');
+                } catch (err) {
+                    showNotification('Error al copiar (fallback): ' + err, 3000);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Botón de descargar
+        downloadButton.addEventListener('click', function() {
+            const content = editor.getValue();
+            let filename = filenameInput.value.trim();
+            
+            if (!filename) { 
+                const selectedModeName = languageSelect.value;
+                const selectedMode = modelist.modesByName[selectedModeName];
+                if (selectedMode && selectedMode.extensions) {
+                    filename = `archivo.${selectedMode.extensions.split('|')[0]}`;
+                } else {
+                    filename = 'archivo.txt';
+                }
+            }
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link); 
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href); 
+            showNotification(`Descargando ${filename}...`);
+        });
+
+        // Ajustar el editor al cambiar el tamaño de la ventana
+        window.addEventListener('resize', function() {
+            editor.resize();
+        });
+        
+        setTimeout(() => editor.resize(), 100);
+
+    </script>
+</body>
+</html>
