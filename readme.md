@@ -89,6 +89,8 @@ Editor tipo Vim con visualizador Mermaid https://bruveping.github.io/Desarrollos
 
 Editor tipo ACE https://bruveping.github.io/DesarrollosP5/Editor_Ace001/
 
+Editor tipo ACE para celular https://bruveping.github.io/DesarrollosP5/Editor_Ace_Celular
+
 herramienta_para_componer_canciones 🎵   https://bruveping.github.io/DesarrollosP5/herramienta_para_componer_canciones/
 
 
