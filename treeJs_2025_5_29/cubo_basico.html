@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Mínimo Three.js</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
+        canvas { display: block; width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Variables globales
+        let scene, camera, renderer, cube;
+
+        // Función de inicialización
+        function init() {
+            // Crear la escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x222222); // Fondo gris oscuro
+
+            // Crear la cámara
+            // PerspectiveCamera(fov, aspect ratio, near, far)
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5; // Alejar la cámara para ver el cubo
+
+            // Crear el renderizador WebGL
+            renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias para bordes suaves
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Adjuntar el canvas del renderizador al contenedor div
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            // Crear una geometría de cubo
+            const geometry = new THREE.BoxGeometry(1, 1, 1); // Ancho, alto, profundidad
+
+            // Crear un material básico (color)
+            // MeshBasicMaterial no se ve afectado por las luces
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Color verde
+
+            // Crear una malla (objeto 3D) combinando geometría y material
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube); // Añadir el cubo a la escena
+
+            // Manejar el redimensionamiento de la ventana
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Iniciar el bucle de animación
+            animate();
+        }
+
+        // Función para manejar el redimensionamiento de la ventana
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix(); // Actualizar la matriz de proyección de la cámara
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Bucle de animación (se ejecuta en cada frame)
+        function animate() {
+            requestAnimationFrame(animate); // Solicitar el próximo frame
+
+            // Rotar el cubo
+            if (cube) {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+            }
+
+            // Renderizar la escena con la cámara
+            renderer.render(scene, camera);
+        }
+
+        // Llamar a la función de inicialización cuando la ventana se haya cargado
+        window.onload = init;
+    </script>
+</body>
+</html>
