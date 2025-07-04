@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>GlitchNode: Editor Markdown Ciberpunk</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.2/dist/purify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #000000 0%, #0f0c29 100%);
+      color: #00ffcc;
+      font-family: 'Share Tech Mono', monospace;
+      margin: 0;
+      padding: 2em;
+      text-shadow: 0 0 5px #00f2ff;
+    }
+    h2 {
+      font-size: 1.8em;
+      color: #ff00cc;
+      border-bottom: 1px solid #ff00cc;
+      padding-bottom: 0.2em;
+      margin-bottom: 0.8em;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: #121212;
+      color: #39ff14;
+      border: 2px solid #00ffff;
+      padding: 1em;
+      font-family: inherit;
+      font-size: 1em;
+      resize: vertical;
+      box-shadow: 0 0 10px #00ffff55;
+    }
+    #preview {
+      margin-top: 2em;
+      padding: 1em;
+      background: #0f0c29;
+      border-left: 5px solid #ff00cc;
+      box-shadow: inset 0 0 10px #ff00cc55;
+    }
+    code, pre {
+      background: #1e1e2f;
+      color: #00ffcc;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+    a { color: #ff77ff; text-decoration: none; }
+    a:hover { text-decoration: underline; color: #f0f; }
+  </style>
+</head>
+<body>
+  <h2>💀 GlitchNode: Editor Markdown Ciberpunk</h2>
+  <textarea id="md-input">
+# 🧠 Manifesto posthumano
+
+- [ ] Hackear el render
+- [x] Inhalar bruma neón
+- [ ] Subir conciencia al loop
+
+**Let the Markdown breathe.**
+  </textarea>
+
+  <div id="preview"></div>
+
+  <script>
+    const input = document.getElementById('md-input');
+    const preview = document.getElementById('preview');
+    const render = () => {
+      const dirty = marked.parse(input.value);
+      preview.innerHTML = DOMPurify.sanitize(dirty);
+    };
+    input.addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>
