@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor MD Ciberpunk</title>
+    
+    <!-- ===============================================
+         DEPENDENCIAS EXTERNAS - CDNs
+         =============================================== -->
+    <!-- Tailwind CSS: Framework de utilidades CSS para diseño responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: 
+         - Inter: Fuente moderna para texto general
+         - Fira Code: Fuente monoespaciada para código -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js: Biblioteca para convertir Markdown a HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- DOMPurify: Sanitiza HTML para prevenir ataques XSS -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.6/dist/purify.min.js"></script>
+    
+    <!-- Mermaid.js: Biblioteca para crear diagramas desde texto -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+
+    <style>
+        /* ===============================================
+           VARIABLES CSS PERSONALIZADAS - TEMA CIBERPUNK
+           =============================================== */
+        :root {
+            /* Paleta de colores ciberpunk */
+            --cyber-bg-dark: #1a0a2a;      /* Fondo principal: púrpura muy oscuro */
+            --cyber-bg-medium: #2a0a3a;    /* Fondo secundario: púrpura medio */
+            --cyber-neon-green: #00ff00;   /* Verde neón brillante para texto/código */
+            --cyber-neon-blue: #00ffff;    /* Azul cian para bordes y elementos */
+            --cyber-neon-pink: #ff00ff;    /* Rosa fucsia para acentos y hover */
+            --cyber-text-light: #e0e0e0;   /* Texto claro general */
+            
+            /* Efectos de resplandor */
+            --cyber-border-glow: rgba(0, 255, 255, 0.5);  /* Resplandor suave para bordes */
+            --cyber-shadow-glow: rgba(0, 255, 255, 0.7);  /* Resplandor más intenso para sombras */
+        }
+
+        /* ===============================================
+           CLASES UTILITARIAS PERSONALIZADAS
+           =============================================== */
+        .cyber-bg-dark { background-color: var(--cyber-bg-dark); }
+        .cyber-bg-medium { background-color: var(--cyber-bg-medium); }
+        .cyber-neon-green { color: var(--cyber-neon-green); }
+        .cyber-neon-blue { color: var(--cyber-neon-blue); }
+        .cyber-neon-pink { color: var(--cyber-neon-pink); }
+        .cyber-text-light { color: var(--cyber-text-light); }
+        .border-cyber-neon-blue { border-color: var(--cyber-neon-blue); }
+
+        /* ===============================================
+           ESTILOS GLOBALES
+           =============================================== */
+        body {
+            font-family: 'Inter', sans-serif;        /* Fuente principal */
+            background-color: var(--cyber-bg-dark);  /* Fondo ciberpunk */
+            color: var(--cyber-text-light);          /* Texto claro por defecto */
+            overflow: hidden;                        /* Evita scroll en el body para UX limpia */
+        }
+
+        /* ===============================================
+           ESTILOS DEL EDITOR (TEXTAREA)
+           =============================================== */
+        #editor {
+            font-family: 'Fira Code', monospace;     /* Fuente monoespaciada para código */
+            background-color: var(--cyber-bg-medium); /* Fondo diferenciado */
+            border: 2px solid var(--cyber-neon-blue); /* Borde neón azul */
+            color: var(--cyber-neon-green);           /* Texto verde neón */
+            box-shadow: 0 0 10px var(--cyber-shadow-glow); /* Resplandor exterior */
+            resize: none;                             /* Desactiva redimensionamiento manual */
+            outline: none;                           /* Quita outline por defecto del navegador */
+            caret-color: var(--cyber-neon-pink);    /* Color del cursor: rosa */
+            
+            /* Personalización del scrollbar (Firefox) */
+            scrollbar-width: thin;
+            scrollbar-color: var(--cyber-neon-green) var(--cyber-bg-medium);
+        }
+
+        /* Scrollbar personalizado para WebKit (Chrome, Safari, Edge) */
+        #editor::-webkit-scrollbar { 
+            width: 12px; /* Ancho del scrollbar */
+        }
+        #editor::-webkit-scrollbar-track { 
+            background: var(--cyber-bg-medium); 
+            border-radius: 6px; 
+        }
+        #editor::-webkit-scrollbar-thumb {
+            background-color: var(--cyber-neon-green);  /* Color del thumb: verde neón */
+            border-radius: 6px;
+            border: 2px solid var(--cyber-bg-dark);     /* Borde para contraste */
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);   /* Resplandor verde */
+        }
+        #editor::-webkit-scrollbar-thumb:hover {
+            background-color: var(--cyber-neon-pink);   /* Cambia a rosa en hover */
+            box-shadow: 0 0 12px var(--cyber-neon-pink); /* Resplandor más intenso */
+        }
+
+        /* ===============================================
+           ESTILOS DEL CONTENEDOR DE VISTA PREVIA
+           =============================================== */
+        #preview-container {
+            background-color: var(--cyber-bg-medium);    /* Fondo consistente con editor */
+            border: 2px solid var(--cyber-neon-pink);    /* Borde rosa para diferenciación */
+            box-shadow: 0 0 10px var(--cyber-shadow-glow); /* Resplandor cian */
+            overflow: hidden;                            /* Oculta contenido que se desborda */
+            position: relative;                          /* Permite posicionamiento absoluto del contenido */
+        }
+
+        /* Contenido real de la vista previa - usa posicionamiento absoluto para scroll manual */
+        #preview-content {
+            position: absolute;      /* Posicionamiento absoluto para control manual del scroll */
+            width: 100%;            /* Ocupa todo el ancho disponible */
+            padding: 1.5rem;        /* Espaciado interno consistente */
+            top: 0;                 /* Posición inicial en la parte superior */
+            left: 0;                /* Alineación izquierda */
+            transition: transform 0.05s linear; /* Transición suave para movimientos de scroll */
+        }
+        
+        /* ===============================================
+           ESTILOS DEL SLIDER VERTICAL PERSONALIZADO
+           =============================================== */
+        #preview-slider {
+            -webkit-appearance: none; /* Quita estilos por defecto del navegador */
+            appearance: none;
+            background: transparent;  /* Fondo transparente */
+            cursor: pointer;         /* Indica que es interactivo */
+            
+            /* Configuración para orientación vertical:
+               La width se convierte en height efectiva tras rotación */
+            width: 80vh;             /* Altura efectiva del slider */
+            max-width: 650px;        /* Límite máximo */
+            min-width: 450px;        /* Límite mínimo */
+            transform: rotate(90deg); /* Rotación 90° para orientación vertical */
+        }
+
+        /* Pista del slider (WebKit) */
+        #preview-slider::-webkit-slider-runnable-track {
+            height: 8px;                                    /* Grosor de la pista */
+            background: var(--cyber-neon-blue);            /* Color azul cian */
+            border-radius: 4px;                            /* Bordes redondeados */
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.7);   /* Resplandor azul */
+        }
+
+        /* Control deslizante (WebKit) */
+        #preview-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -11px;                             /* Centra verticalmente sobre la pista */
+            height: 30px;                                  /* Altura del control */
+            width: 15px;                                   /* Ancho del control */
+            border-radius: 5px;                           /* Bordes redondeados */
+            background: var(--cyber-neon-pink);          /* Color rosa neón */
+            border: 2px solid var(--cyber-bg-dark);      /* Borde para contraste */
+            box-shadow: 0 0 12px var(--cyber-neon-pink); /* Resplandor rosa */
+        }
+
+        /* ===============================================
+           ESTILOS PARA ELEMENTOS MARKDOWN RENDERIZADOS
+           =============================================== */
+        /* Encabezados (h1, h2, h3) */
+        #preview-content h1, #preview-content h2, #preview-content h3 {
+            color: var(--cyber-neon-blue);                    /* Color azul cian */
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);     /* Sombra de texto con resplandor */
+            border-bottom: 1px dashed var(--cyber-neon-pink); /* Línea inferior discontinua rosa */
+            padding-bottom: 0.5rem;                          /* Espaciado inferior */
+            margin-top: 1.5rem;                              /* Margen superior */
+            margin-bottom: 1rem;                             /* Margen inferior */
+        }
+
+        /* Enlaces */
+        #preview-content a {
+            color: var(--cyber-neon-green);            /* Verde neón */
+            text-decoration: none;                     /* Sin subrayado por defecto */
+            border-bottom: 1px dotted var(--cyber-neon-green); /* Línea inferior punteada */
+        }
+        #preview-content a:hover {
+            color: var(--cyber-neon-pink);            /* Cambia a rosa en hover */
+            border-bottom-color: var(--cyber-neon-pink); /* Línea también cambia a rosa */
+        }
+
+        /* Código inline */
+        #preview-content code {
+            background-color: rgba(0, 255, 0, 0.1);   /* Fondo verde semitransparente */
+            color: var(--cyber-neon-green);           /* Texto verde neón */
+            padding: 0.2em 0.4em;                     /* Padding interno */
+            border-radius: 0.25rem;                   /* Bordes ligeramente redondeados */
+            font-family: 'Fira Code', monospace;      /* Fuente monoespaciada */
+        }
+
+        /* Bloques de código (pre) */
+        #preview-content pre {
+            background-color: rgba(0, 0, 0, 0.5);           /* Fondo negro semitransparente */
+            border: 1px solid var(--cyber-neon-blue);       /* Borde azul */
+            padding: 1rem;                                  /* Padding generoso */
+            border-radius: 0.5rem;                          /* Bordes redondeados */
+            overflow-x: auto;                               /* Scroll horizontal si es necesario */
+            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.3); /* Sombra interior azul */
+        }
+        #preview-content pre code { 
+            background: none;        /* Sin fondo adicional */
+            color: var(--cyber-neon-green); /* Verde neón */
+            padding: 0;             /* Sin padding adicional */
+            border-radius: 0;       /* Sin bordes redondeados */
+        }
+
+        /* Citas (blockquote) */
+        #preview-content blockquote {
+            border-left: 4px solid var(--cyber-neon-pink); /* Borde izquierdo rosa grueso */
+            color: var(--cyber-text-light);                /* Color de texto estándar */
+            padding-left: 1rem;                            /* Padding izquierdo */
+            margin: 1rem 0;                                /* Márgenes verticales */
+            opacity: 0.8;                                  /* Ligeramente transparente */
+        }
+
+        /* Tablas */
+        #preview-content table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 1rem 0; 
+        }
+        #preview-content th, #preview-content td { 
+            border: 1px solid var(--cyber-neon-blue); /* Bordes azules */
+            padding: 0.5rem; 
+            text-align: left; 
+        }
+        #preview-content th { 
+            background-color: rgba(0, 255, 255, 0.1); /* Fondo azul semitransparente para encabezados */
+            color: var(--cyber-neon-blue); 
+        }
+
+        /* Listas */
+        #preview-content ul, #preview-content ol { 
+            padding-left: 1.5rem; 
+        }
+        #preview-content li { 
+            margin-bottom: 0.5rem; 
+        }
+
+        /* ===============================================
+           ESTILOS DE BOTONES CIBERPUNK
+           =============================================== */
+        .cyber-button {
+            background-color: var(--cyber-neon-blue);      /* Fondo azul cian */
+            color: var(--cyber-bg-dark);                   /* Texto oscuro para contraste */
+            font-weight: bold;                             /* Texto en negrita */
+            padding: 0.75rem 1.5rem;                       /* Padding cómodo */
+            border-radius: 0.5rem;                         /* Bordes redondeados */
+            transition: all 0.2s ease-in-out;             /* Transiciones suaves */
+            box-shadow: 0 0 10px var(--cyber-shadow-glow); /* Resplandor inicial */
+            border: none;                                  /* Sin borde por defecto */
+            cursor: pointer;                               /* Indica que es clickeable */
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);         /* Sombra de texto para legibilidad */
+        }
+        .cyber-button:hover {
+            background-color: var(--cyber-neon-pink);      /* Cambia a rosa en hover */
+            box-shadow: 0 0 15px var(--cyber-neon-pink);   /* Resplandor más intenso */
+            transform: translateY(-2px);                   /* Efecto de elevación */
+        }
+        .cyber-button:active { 
+            transform: translateY(0);                      /* Vuelve a posición original al hacer click */
+            box-shadow: 0 0 5px var(--cyber-neon-pink);   /* Resplandor reducido */
+        }
+
+        /* ===============================================
+           EFECTOS VISUALES ESPECIALES
+           =============================================== */
+        /* Efecto para arrastrar y soltar archivos */
+        .drag-over {
+            border: 4px dashed var(--cyber-neon-green) !important;  /* Borde verde discontinuo */
+            box-shadow: 0 0 20px var(--cyber-neon-green) !important; /* Resplandor verde intenso */
+        }
+
+        /* Mensaje de carga superpuesto */
+        #loading-message {
+            position: absolute;                            /* Posicionamiento absoluto para overlay */
+            top: 50%;                                     /* Centrado vertical */
+            left: 50%;                                    /* Centrado horizontal */
+            transform: translate(-50%, -50%);            /* Ajuste fino del centrado */
+            background-color: rgba(0, 0, 0, 0.8);        /* Fondo negro semitransparente */
+            color: var(--cyber-neon-green);              /* Texto verde neón */
+            padding: 20px;                               /* Padding generoso */
+            border-radius: 10px;                         /* Bordes muy redondeados */
+            border: 2px solid var(--cyber-neon-blue);    /* Borde azul */
+            box-shadow: 0 0 20px var(--cyber-shadow-glow); /* Resplandor azul intenso */
+            z-index: 1000;                               /* Z-index alto para estar encima de todo */
+            display: none;                               /* Oculto por defecto */
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen p-4 cyber-bg-dark text-cyber-text-light">
+
+    <!-- ===============================================
+         MENSAJE DE CARGA SUPERPUESTO
+         =============================================== -->
+    <div id="loading-message" class="text-2xl font-bold">Cargando...</div>
+
+    <!-- ===============================================
+         CONTENEDOR PRINCIPAL DE LA APLICACIÓN
+         =============================================== -->
+    <div id="app-container" class="flex flex-1 flex-col gap-4 rounded-lg overflow-hidden">
+
+        <!-- ===============================================
+             BARRA DE CONTROLES SUPERIORES
+             =============================================== -->
+        <div class="flex justify-end gap-4 p-2 rounded-lg cyber-bg-medium max-w-[95%] mx-auto w-full">
+            <!-- Input de archivo oculto (se activa mediante botón) -->
+            <input type="file" id="fileInput" accept=".md" class="hidden">
+            
+            <!-- Botones de control -->
+            <button id="openFileBtn" class="cyber-button">Abrir Archivo MD</button>
+            <button id="refreshPreviewBtn" class="cyber-button">Actualizar Vista Previa</button>
+            <button id="toggleEditorBtn" class="cyber-button">Ocultar Editor</button>
+            <button id="downloadMdBtn" class="cyber-button">Descargar MD</button>
+        </div>
+
+        <!-- ===============================================
+             ÁREA PRINCIPAL: EDITOR Y VISTA PREVIA
+             =============================================== -->
+        <div class="flex flex-1 gap-4 max-w-[95%] mx-auto w-full">
+            
+            <!-- EDITOR DE MARKDOWN -->
+            <textarea id="editor" class="w-1/2 p-6 rounded-lg text-lg" 
+                      placeholder="Escribe tu Markdown aquí..."></textarea>
+
+            <!-- CONTENEDOR DE VISTA PREVIA CON SLIDER -->
+            <div id="preview-wrapper" class="w-1/2 flex items-center gap-2">
+                
+                <!-- Contenedor del Slider Vertical (inicialmente oculto) -->
+                <div id="slider-wrapper" class="hidden h-full w-10 flex justify-center items-center">
+                    <input type="range" id="preview-slider">
+                </div>
+                
+                <!-- Contenedor Principal de Vista Previa -->
+                <div id="preview-container" class="h-full flex-1 rounded-lg">
+                    <div id="preview-content">
+                        <!-- El contenido Markdown renderizado aparecerá aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===============================================
+           INICIALIZACIÓN Y CONFIGURACIÓN
+           =============================================== */
+        
+        // Configuración inicial de Mermaid para diagramas
+        mermaid.initialize({
+            startOnLoad: false,        // No iniciar automáticamente
+            theme: 'dark',            // Tema oscuro para consistencia visual
+            securityLevel: 'loose',   // Nivel de seguridad relajado para más funcionalidad
+            // Configuraciones específicas por tipo de diagrama
+            flowchart: { curve: 'basis' },                    // Curvas suaves en flowcharts
+            sequence: { showNumbers: true },                  // Mostrar números en diagramas de secuencia
+            gitGraph: { 
+                showBranches: true, 
+                showCommitLabel: true, 
+                mainBranchName: 'main' 
+            }
+        });
+
+        /* ===============================================
+           REFERENCIAS A ELEMENTOS DEL DOM
+           =============================================== */
+        
+        // Elementos principales
+        const editor = document.getElementById('editor');
+        const previewContainer = document.getElementById('preview-container');
+        const previewContent = document.getElementById('preview-content');
+        const loadingMessage = document.getElementById('loading-message');
+        const appContainer = document.getElementById('app-container');
+        
+        // Controles de interfaz
+        const fileInput = document.getElementById('fileInput');
+        const openFileBtn = document.getElementById('openFileBtn');
+        const refreshPreviewBtn = document.getElementById('refreshPreviewBtn');
+        const toggleEditorBtn = document.getElementById('toggleEditorBtn');
+        const downloadMdBtn = document.getElementById('downloadMdBtn');
+        
+        // Elementos del slider y contenedores
+        const previewSlider = document.getElementById('preview-slider');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const sliderWrapper = document.getElementById('slider-wrapper');
+
+        /* ===============================================
+           VARIABLES DE ESTADO GLOBAL
+           =============================================== */
+        
+        let fileCounter = 1;        // Contador para nombres de archivo únicos
+        let isEditorHidden = false; // Estado de visibilidad del editor
+
+        /* ===============================================
+           CONFIGURACIÓN DE MARKED.JS
+           =============================================== */
+        
+        marked.setOptions({
+            gfm: true,              // GitHub Flavored Markdown habilitado
+            breaks: true,           // Saltos de línea se convierten en <br>
+            // Función de resaltado personalizada para código
+            highlight: (code, lang) => {
+                // Si es código Mermaid, devuelve sin procesar para procesamiento posterior
+                return (lang && lang.toLowerCase() === 'mermaid') ? code : code;
+            }
+        });
+
+        /* ===============================================
+           FUNCIÓN PRINCIPAL: ACTUALIZAR VISTA PREVIA
+           =============================================== */
+        
+        async function updatePreview() {
+            // 1. Obtener el texto Markdown del editor
+            const markdownText = editor.value;
+            
+            // 2. Convertir Markdown a HTML usando Marked.js
+            let html = marked.parse(markdownText);
+            
+            // 3. Sanitizar HTML para prevenir ataques XSS
+            html = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
+
+            // 4. Crear un contenedor temporal para manipular el DOM
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            // 5. Procesar bloques de código Mermaid
+            // Busca elementos <pre><code class="language-mermaid">
+            tempDiv.querySelectorAll('pre code.language-mermaid').forEach(codeBlock => {
+                // Crear un nuevo div con clase 'mermaid' para que Mermaid lo procese
+                const mermaidDiagramContainer = document.createElement('div');
+                mermaidDiagramContainer.className = 'mermaid';
+                mermaidDiagramContainer.textContent = codeBlock.textContent;
+                
+                // Reemplazar el bloque de código con el contenedor Mermaid
+                codeBlock.parentNode.replaceWith(mermaidDiagramContainer);
+            });
+
+            // 6. Insertar el HTML procesado en el contenedor de vista previa
+            previewContent.innerHTML = tempDiv.innerHTML;
+            
+            // 7. Resetear posición de scroll
+            previewContent.style.transform = `translateY(0px)`;
+
+            // 8. Mostrar mensaje de carga y procesar diagramas Mermaid
+            loadingMessage.style.display = 'block';
+            try {
+                // Ejecutar Mermaid solo en elementos dentro del contenedor de vista previa
+                await mermaid.run({ 
+                    querySelector: '#preview-content .mermaid', 
+                    suppressErrors: true 
+                });
+            } catch (error) {
+                // Manejo de errores en caso de que Mermaid falle
+                console.error("Error al renderizar Mermaid:", error);
+            } finally {
+                // Ocultar mensaje de carga independientemente del resultado
+                loadingMessage.style.display = 'none';
+            }
+        }
+        
+        /* ===============================================
+           SINCRONIZACIÓN DE SCROLL ENTRE EDITOR Y VISTA PREVIA
+           =============================================== */
+        
+        function syncPreviewScroll() {
+            // Solo sincronizar cuando el editor esté visible
+            if (isEditorHidden) return;
+            
+            // Calcular la altura total desplazable del editor
+            const editorScrollHeight = editor.scrollHeight - editor.clientHeight;
+            if (editorScrollHeight <= 0) return; // No hay contenido que desplazar
+            
+            // Calcular el porcentaje de scroll actual del editor
+            const scrollPercentage = editor.scrollTop / editorScrollHeight;
+            
+            // Calcular la altura máxima que se puede desplazar en la vista previa
+            const maxTranslateY = Math.max(0, previewContent.scrollHeight - previewContainer.clientHeight);
+            
+            // Aplicar el mismo porcentaje de scroll a la vista previa
+            const newTranslateY = scrollPercentage * maxTranslateY;
+            previewContent.style.transform = `translateY(-${newTranslateY}px)`;
+        }
+
+        /* ===============================================
+           EVENT LISTENERS - FUNCIONALIDAD PRINCIPAL
+           =============================================== */
+
+        // Sincronizar scroll del editor con vista previa
+        editor.addEventListener('scroll', syncPreviewScroll);
+
+        // Control manual de scroll con slider (cuando editor está oculto)
+        previewSlider.addEventListener('input', () => {
+            if (!isEditorHidden) return; // Solo funciona cuando editor está oculto
+            
+            // Aplicar directamente el valor del slider como translateY
+            const translateY = previewSlider.value;
+            previewContent.style.transform = `translateY(${translateY}px)`;
+        });
+
+        /* ===============================================
+           FUNCIONALIDAD DE TOGGLE DEL EDITOR
+           =============================================== */
+        
+        toggleEditorBtn.addEventListener('click', () => {
+            // Alternar estado de visibilidad
+            isEditorHidden = !isEditorHidden;
+
+            if (isEditorHidden) {
+                // MODO: SOLO VISTA PREVIA
+                
+                // Ocultar editor
+                editor.classList.add('hidden');
+                
+                // Expandir vista previa a ancho completo
+                previewWrapper.classList.remove('w-1/2');
+                previewWrapper.classList.add('w-full');
+                
+                // Cambiar texto del botón
+                toggleEditorBtn.textContent = 'Mostrar Editor';
+                
+            } else {
+                // MODO: EDITOR + VISTA PREVIA
+                
+                // Mostrar editor
+                editor.classList.remove('hidden');
+                
+                // Restaurar ancho 50/50
+                previewWrapper.classList.remove('w-full');
+                previewWrapper.classList.add('w-1/2');
+                
+                // Cambiar texto del botón
+                toggleEditorBtn.textContent = 'Ocultar Editor';
+            }
+
+            // Esperar un frame para que se complete el cambio de layout
+            setTimeout(() => {
+                // Actualizar vista previa para recalcular dimensiones
+                updatePreview().then(() => {
+                    if (isEditorHidden) {
+                        // CONFIGURAR SLIDER PARA MODO SOLO VISTA PREVIA
+                        
+                        // Mostrar el contenedor del slider
+                        sliderWrapper.classList.remove('hidden');
+                        sliderWrapper.classList.add('flex');
+
+                        // Calcular rango de desplazamiento
+                        const scrollableHeight = previewContent.scrollHeight - previewContainer.clientHeight;
+                        const multiplier = 1; // Factor de amplificación del movimiento
+                        
+                        // Configurar rango del slider
+                        previewSlider.max = 0;                          // Máximo (posición inicial)
+                        previewSlider.min = -scrollableHeight * multiplier; // Mínimo (totalmente desplazado)
+                        previewSlider.value = 0;                        // Posición inicial
+                        
+                        // Resetear posición de la vista previa
+                        previewContent.style.transform = 'translateY(0px)';
+                        
+                    } else {
+                        // OCULTAR SLIDER Y RESTAURAR SINCRONIZACIÓN AUTOMÁTICA
+                        
+                        sliderWrapper.classList.add('hidden');
+                        sliderWrapper.classList.remove('flex');
+                        
+                        // Restaurar sincronización con editor
+                        syncPreviewScroll();
+                    }
+                });
+            }, 50); // Delay mínimo para permitir que el DOM se actualice
+        });
+        
+        /* ===============================================
+           EVENT LISTENERS - CONTROLES DE INTERFAZ
+           =============================================== */
+
+        // Actualizar vista previa en tiempo real mientras se escribe
+        editor.addEventListener('input', updatePreview);
+        
+        // Botón de actualización manual
+        refreshPreviewBtn.addEventListener('click', updatePreview);
+
+        /* ===============================================
+           FUNCIONALIDAD DE DESCARGA DE ARCHIVOS
+           =============================================== */
+        
+        downloadMdBtn.addEventListener('click', () => {
+            // Obtener contenido actual del editor
+            const markdownContent = editor.value;
+            
+            // Generar nombre de archivo por defecto con contador
+            const defaultFilename = `archivo${String(fileCounter).padStart(3, '0')}.md`;
+            
+            // Pedir al usuario el nombre del archivo
+            let filename = prompt('Introduce el nombre del archivo MD:', defaultFilename);
+            
+            // Cancelar si el usuario presiona cancelar
+            if (filename === null) return;
+            
+            // Asegurar que el archivo termine en .md
+            if (!filename.toLowerCase().endsWith('.md')) {
+                filename += '.md';
+            }
+            
+            // Crear blob con el contenido Markdown
+            const blob = new Blob([markdownContent], { type: 'text/markdown' });
+            
+            // Crear URL temporal para el blob
+            const url = URL.createObjectURL(blob);
+            
+            // Crear elemento <a> temporal para forzar descarga
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            
+            // Simular click para iniciar descarga
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Limpiar URL temporal para liberar memoria
+            URL.revokeObjectURL(url);
+            
+            // Incrementar contador para próximo archivo
+            fileCounter++;
+        });
+
+        /* ===============================================
+           FUNCIONALIDAD DE ARRASTRAR Y SOLTAR ARCHIVOS
+           =============================================== */
+        
+        // Lista de eventos de drag & drop para manejar
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            appContainer.addEventListener(eventName, e => {
+                // Prevenir comportamiento por defecto del navegador
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // DRAGOVER: Cuando se arrastra un archivo sobre el contenedor
+                if (eventName === 'dragover') {
+                    appContainer.classList.add('drag-over'); // Agregar efecto visual
+                }
+                
+                // DRAGLEAVE/DROP: Cuando se sale del área o se suelta
+                if (eventName === 'dragleave' || eventName === 'drop') {
+                    appContainer.classList.remove('drag-over'); // Quitar efecto visual
+                }
+                
+                // DROP: Cuando se suelta el archivo
+                if (eventName === 'drop') {
+                    // Obtener el primer archivo soltado
+                    const file = e.dataTransfer.files[0];
+                    
+                    // Verificar que sea un archivo .md
+                    if (file && file.name.endsWith('.md')) {
+                        // Usar FileReader para leer el contenido del archivo
+                        const reader = new FileReader();
+                        
+                        // Callback cuando se complete la lectura
+                        reader.onload = (event) => {
+                            // Cargar contenido en el editor
+                            editor.value = event.target.result;
+                            // Actualizar vista previa inmediatamente
+                            updatePreview();
+                        };
+                        
+                        // Iniciar lectura como texto
+                        reader.readAsText(file);
+                    } else {
+                        // Mostrar error si no es un archivo .md válido
+                        alert('Por favor, arrastra un archivo .md');
+                    }
+                }
+            });
+        });
+
+        /* ===============================================
+           FUNCIONALIDAD DE ABRIR ARCHIVO MEDIANTE BOTÓN
+           =============================================== */
+        
+        // Hacer click en el input de archivo oculto
+        openFileBtn.addEventListener('click', () => fileInput.click());
+        
+        // Manejar selección de archivo
+        fileInput.addEventListener('change', (e) => {
+            // Obtener archivo seleccionado
+            const file = e.target.files[0];
+            
+            // Procesar si es un archivo .md válido
+            if (file && file.name.endsWith('.md')) {
+                const reader = new FileReader();
+                
+                // Callback de lectura exitosa
+                reader.onload = (event) => {
+                    editor.value = event.target.result;
+                    updatePreview();
+                };
+                
+                // Leer archivo como texto
+                reader.readAsText(file);
+                
+            } else if (file) {
+                // Error si se seleccionó un archivo que no es .md
+                alert('Por favor, selecciona un archivo .md');
+            }
+            // Si no se seleccionó archivo, no hacer nada
+        });
+
+        /* ===============================================
+           INICIALIZACIÓN DE LA APLICACIÓN
+           =============================================== */
+        
+        // Ejecutar cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', () => {
+            // Contenido inicial de ejemplo para demostrar funcionalidades
+            editor.value = `# ¡Bienvenido al editor MD Ciberpunk!
+
+Este es un editor de Markdown con tema ciberpunk que incluye:
+
+- **Sincronización de scroll** entre editor y vista previa
+- **Drag & Drop** para cargar archivos .md
+- **Soporte completo para Mermaid** (diagramas)
+- **Descarga de archivos** con nombres personalizados
+- **Vista previa en tiempo real**
+- **Modo solo vista previa** con slider de navegación
+
+## 🚀 Características Principales
+
+### 1. Editor Sincronizado
+El scroll del editor se sincroniza automáticamente con la vista previa para una experiencia fluida.
+
+### 2. Soporte para Código
+\`\`\`javascript
+// Ejemplo de código JavaScript
+function saludarMundo() {
+    console.log("¡Hola, mundo ciberpunk!");
+    return "Código con sintaxis resaltada";
+}
+
+// Llamar a la función
+saludarMundo();
+\`\`\`
+
+### 3. Diagramas Mermaid
+\`\`\`mermaid
+graph TD;
+    A[Inicio del Editor] --> B{¿Cargar archivo?};
+    B -->|Sí| C[Drag & Drop];
+    B -->|No| D[Escribir Markdown];
+    C --> E[Mostrar Vista Previa];
+    D --> E;
+    E --> F[Sincronizar Scroll];
+    F --> G[Renderizar Mermaid];
+    G --> H[¡Listo!];
+\`\`\`
+
+### 4. Tablas de Ejemplo
+| Característica | Estado | Descripción |
+|---|---|---|
+| Markdown Básico | ✅ | Encabezados, párrafos, énfasis |
+| Código | ✅ | Bloques y inline con resaltado |
+| Mermaid | ✅ | Diagramas de flujo, secuencia, etc. |
+| Drag & Drop | ✅ | Arrastrar archivos .md |
+| Descarga | ✅ | Guardar trabajo como .md |
+
+### 5. Otros Elementos
+
+> **Nota importante:** Este editor utiliza un tema ciberpunk con colores neón y efectos visuales especiales para una experiencia única.
+
+#### Lista de Funciones:
+- Sincronización automática de scroll
+- Vista previa en tiempo real
+- Soporte completo para GitHub Flavored Markdown
+- Renderizado de diagramas Mermaid
+- Interfaz responsive y moderna
+- Efectos visuales ciberpunk
+
+---
+
+## 📝 Instrucciones de Uso
+
+1. **Cargar archivo**: Arrastra un archivo .md o usa el botón "Abrir Archivo MD"
+2. **Escribir**: Simplemente escribe Markdown en el editor izquierdo
+3. **Vista previa**: Observa el resultado en tiempo real a la derecha
+4. **Modo pantalla completa**: Usa "Ocultar Editor" para ver solo la vista previa
+5. **Guardar**: Descarga tu trabajo con "Descargar MD"
+
+### Texto de Relleno para Demostrar Scroll
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+
+Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+
+### Más Contenido para Scroll
+
+Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
+
+**¡Disfruta explorando todas las funcionalidades de este editor ciberpunk!** 🌟
+`;
+            
+            // Renderizar vista previa inicial
+            updatePreview();
+        });
+
+        /* ===============================================
+           FUNCIONES UTILITARIAS ADICIONALES
+           =============================================== */
+        
+        /**
+         * Función para detectar si el contenido ha cambiado
+         * Útil para implementar guardado automático en el futuro
+         */
+        function hasContentChanged() {
+            // Esta función puede expandirse para comparar con una versión guardada
+            return editor.value.trim() !== '';
+        }
+        
+        /**
+         * Función para obtener estadísticas del documento
+         * Útil para mostrar información al usuario
+         */
+        function getDocumentStats() {
+            const content = editor.value;
+            return {
+                characters: content.length,
+                charactersNoSpaces: content.replace(/\s/g, '').length,
+                words: content.trim() ? content.trim().split(/\s+/).length : 0,
+                lines: content.split('\n').length,
+                paragraphs: content.split(/\n\s*\n/).filter(p => p.trim()).length
+            };
+        }
+        
+        /**
+         * Función para insertar texto en la posición del cursor
+         * Útil para botones de formato rápido
+         */
+        function insertAtCursor(textToInsert) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const text = editor.value;
+            
+            // Insertar texto en la posición del cursor
+            editor.value = text.substring(0, start) + textToInsert + text.substring(end);
+            
+            // Restaurar posición del cursor después del texto insertado
+            const newCursorPos = start + textToInsert.length;
+            editor.setSelectionRange(newCursorPos, newCursorPos);
+            
+            // Actualizar vista previa
+            updatePreview();
+        }
+        
+        /**
+         * Función para envolver texto seleccionado
+         * Útil para formato rápido (negrita, cursiva, etc.)
+         */
+        function wrapSelectedText(beforeText, afterText = null) {
+            // Si no se especifica afterText, usar el mismo que beforeText
+            afterText = afterText || beforeText;
+            
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selectedText = editor.value.substring(start, end);
+            
+            // Si no hay texto seleccionado, insertar marcadores vacíos
+            if (selectedText === '') {
+                insertAtCursor(beforeText + afterText);
+                // Posicionar cursor entre los marcadores
+                editor.setSelectionRange(start + beforeText.length, start + beforeText.length);
+            } else {
+                // Envolver texto seleccionado
+                const wrappedText = beforeText + selectedText + afterText;
+                editor.value = editor.value.substring(0, start) + wrappedText + editor.value.substring(end);
+                
+                // Mantener selección del contenido envuelto
+                editor.setSelectionRange(start + beforeText.length, start + beforeText.length + selectedText.length);
+            }
+            
+            // Actualizar vista previa
+            updatePreview();
+        }
+
+        /* ===============================================
+           ATAJOS DE TECLADO (OPCIONAL)
+           =============================================== */
+        
+        // Agregar atajos de teclado útiles
+        editor.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + S: Descargar archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                downloadMdBtn.click();
+            }
+            
+            // Ctrl/Cmd + O: Abrir archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+                e.preventDefault();
+                openFileBtn.click();
+            }
+            
+            // F5: Actualizar vista previa
+            if (e.key === 'F5') {
+                e.preventDefault();
+                updatePreview();
+            }
+            
+            // F11: Toggle editor
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleEditorBtn.click();
+            }
+        });
+
+        /* ===============================================
+           DEBUGGING Y LOGGING (OPCIONAL)
+           =============================================== */
+        
+        // Función de log para debugging (se puede desactivar en producción)
+        function debugLog(message, data = null) {
+            if (console && typeof console.log === 'function') {
+                const timestamp = new Date().toISOString();
+                console.log(`[${timestamp}] Editor MD: ${message}`, data || '');
+            }
+        }
+        
+        // Log inicial
+        debugLog('Editor MD Ciberpunk inicializado correctamente');
+
+    </script>
+</body>
+</html>
