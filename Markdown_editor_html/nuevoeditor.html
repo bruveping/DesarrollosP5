@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor MD Ciberpunk</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter para texto general, Fira Code para código -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Marked.js para convertir Markdown a HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify para sanitizar el HTML generado -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.6/dist/purify.min.js"></script>
+    <!-- Mermaid.js para diagramas -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+
+    <style>
+        /* Definición de colores ciberpunk personalizados para Tailwind */
+        :root {
+            --cyber-bg-dark: #1a0a2a; /* Fondo oscuro, casi negro con un toque púrpura */
+            --cyber-bg-medium: #2a0a3a; /* Fondo un poco más claro */
+            --cyber-neon-green: #00ff00; /* Verde neón brillante */
+            --cyber-neon-blue: #00ffff; /* Azul cian neón */
+            --cyber-neon-pink: #ff00ff; /* Rosa fucsia neón */
+            --cyber-text-light: #e0e0e0; /* Texto claro */
+            --cyber-border-glow: rgba(0, 255, 255, 0.5); /* Resplandor para bordes */
+            --cyber-shadow-glow: rgba(0, 255, 255, 0.7); /* Resplandor para sombras */
+        }
+
+        .cyber-bg-dark { background-color: var(--cyber-bg-dark); }
+        .cyber-bg-medium { background-color: var(--cyber-bg-medium); }
+        .cyber-neon-green { color: var(--cyber-neon-green); }
+        .cyber-neon-blue { color: var(--cyber-neon-blue); }
+        .cyber-neon-pink { color: var(--cyber-neon-pink); }
+        .cyber-text-light { color: var(--cyber-text-light); }
+        .border-cyber-neon-blue { border-color: var(--cyber-neon-blue); }
+
+        /* Estilos generales para el cuerpo */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cyber-bg-dark);
+            color: var(--cyber-text-light);
+            overflow: hidden; /* Evitar scroll de body */
+        }
+
+        /* Estilo para el editor de texto (textarea) */
+        #editor {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--cyber-bg-medium);
+            border: 2px solid var(--cyber-neon-blue);
+            color: var(--cyber-neon-green); /* Texto del editor en verde neón */
+            box-shadow: 0 0 10px var(--cyber-shadow-glow);
+            resize: none; /* Deshabilitar redimensionamiento manual */
+            outline: none; /* Eliminar el contorno al enfocar */
+            caret-color: var(--cyber-neon-pink); /* Color del cursor */
+            /* Estilos de la barra de desplazamiento personalizada para WebKit (Chrome, Safari, Edge) */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: var(--cyber-neon-green) var(--cyber-bg-medium); /* Firefox */
+        }
+
+        /* Estilos de la barra de desplazamiento personalizada para WebKit (Chrome, Safari, Edge) para el editor */
+        #editor::-webkit-scrollbar {
+            width: 12px; /* Ancho de la barra de desplazamiento */
+        }
+
+        #editor::-webkit-scrollbar-track {
+            background: var(--cyber-bg-medium); /* Fondo de la pista */
+            border-radius: 6px;
+        }
+
+        #editor::-webkit-scrollbar-thumb {
+            background-color: var(--cyber-neon-green); /* Color del "pulgar" (slider) */
+            border-radius: 6px;
+            border: 2px solid var(--cyber-bg-dark); /* Borde para el pulgar */
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); /* Resplandor para el pulgar */
+        }
+
+        #editor::-webkit-scrollbar-thumb:hover {
+            background-color: var(--cyber-neon-pink); /* Color al pasar el ratón */
+            box-shadow: 0 0 12px var(--cyber-neon-pink);
+        }
+
+
+        /* Estilo para el contenedor de la vista previa (no scrollable directamente) */
+        #preview-container {
+            background-color: var(--cyber-bg-medium);
+            border: 2px solid var(--cyber-neon-pink);
+            box-shadow: 0 0 10px var(--cyber-shadow-glow);
+            overflow: hidden; /* Oculta cualquier scrollbar nativo */
+            position: relative; /* Necesario para posicionar preview-content */
+        }
+
+        /* Estilo para el contenido real de la vista previa (se moverá con transform) */
+        #preview-content {
+            position: absolute;
+            width: 100%;
+            padding: 1.5rem; /* Equivalente a p-6 de Tailwind */
+            top: 0; /* Posición inicial */
+            left: 0;
+            transition: transform 0.05s linear; /* Suavizar el movimiento del contenido */
+        }
+
+        /* Estilos para elementos Markdown dentro de la vista previa */
+        #preview-content h1, #preview-content h2, #preview-content h3, #preview-content h4, #preview-content h5, #preview-content h6 {
+            color: var(--cyber-neon-blue);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+            border-bottom: 1px dashed var(--cyber-neon-pink);
+            padding-bottom: 0.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        #preview-content a {
+            color: var(--cyber-neon-green);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--cyber-neon-green);
+        }
+        #preview-content a:hover {
+            color: var(--cyber-neon-pink);
+            border-bottom-color: var(--cyber-neon-pink);
+        }
+        #preview-content code {
+            background-color: rgba(0, 255, 0, 0.1);
+            color: var(--cyber-neon-green);
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-family: 'Fira Code', monospace;
+        }
+        #preview-content pre {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--cyber-neon-blue);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+        #preview-content pre code {
+            background: none;
+            color: var(--cyber-neon-green);
+            padding: 0;
+            border-radius: 0;
+        }
+        #preview-content blockquote {
+            border-left: 4px solid var(--cyber-neon-pink);
+            color: var(--cyber-text-light);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            opacity: 0.8;
+        }
+        #preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        #preview-content th, #preview-content td {
+            border: 1px solid var(--cyber-neon-blue);
+            padding: 0.5rem;
+            text-align: left;
+        }
+        #preview-content th {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--cyber-neon-blue);
+        }
+        #preview-content ul, #preview-content ol {
+            padding-left: 1.5rem;
+        }
+        #preview-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Estilo para los botones */
+        .cyber-button {
+            background-color: var(--cyber-neon-blue);
+            color: var(--cyber-bg-dark);
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 0 10px var(--cyber-shadow-glow);
+            border: none;
+            cursor: pointer;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .cyber-button:hover {
+            background-color: var(--cyber-neon-pink);
+            box-shadow: 0 0 15px var(--cyber-neon-pink);
+            transform: translateY(-2px);
+        }
+        .cyber-button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 5px var(--cyber-neon-pink);
+        }
+
+        /* Estilo para el contenedor de arrastrar y soltar */
+        .drag-over {
+            border: 4px dashed var(--cyber-neon-green) !important;
+            box-shadow: 0 0 20px var(--cyber-neon-green) !important;
+        }
+
+        /* Estilo para el mensaje de carga */
+        #loading-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--cyber-neon-green);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--cyber-neon-blue);
+            box-shadow: 0 0 20px var(--cyber-shadow-glow);
+            z-index: 1000;
+            display: none; /* Oculto por defecto */
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen p-4 cyber-bg-dark text-cyber-text-light">
+
+    <!-- Mensaje de carga -->
+    <div id="loading-message" class="text-2xl font-bold">Cargando...</div>
+
+    <!-- Contenedor principal de la aplicación -->
+    <div id="app-container" class="flex flex-1 gap-4 rounded-lg overflow-hidden">
+
+        <!-- Sección principal: Editor y Vista Previa -->
+        <main class="flex-1 flex flex-col gap-4">
+            <!-- Controles superiores -->
+            <div class="flex justify-end gap-4 p-2 rounded-lg cyber-bg-medium">
+                <input type="file" id="fileInput" accept=".md" class="hidden">
+                <button id="openFileBtn" class="cyber-button">Abrir Archivo MD</button>
+            </div>
+
+            <!-- Editor y Vista Previa -->
+            <div class="flex flex-1 gap-4">
+                <!-- Editor de Markdown -->
+                <textarea id="editor" class="w-1/2 p-6 rounded-lg text-lg"></textarea>
+
+                <!-- Contenedor de Vista Previa (sin slider vertical externo) -->
+                <div id="preview-container" class="w-1/2 rounded-lg">
+                    <div id="preview-content" class="absolute inset-0 p-6">
+                        <!-- El contenido Markdown renderizado aparecerá aquí -->
+                        <h1 class="text-3xl font-bold">¡Bienvenido al editor MD!</h1>
+                        <p>Arrastra y suelta un archivo <code>.md</code> aquí, usa el botón "Abrir Archivo MD", o simplemente empieza a escribir en el editor de la izquierda.</p>
+                        <p>Este editor soporta la sintaxis básica de Markdown y también puede renderizar diagramas <code class="cyber-neon-blue">Mermaid</code>.</p>
+                        <h2 class="text-2xl font-bold">Ejemplo de Código</h2>
+                        <pre><code>function helloWorld() {
+    console.log("Hello, Cyberpunk World!");
+}
+helloWorld();</code></pre>
+                        <h2 class="text-2xl font-bold">Ejemplo de Mermaid</h2>
+                        <p>Aquí tienes un diagrama de Mermaid:</p>
+                        <pre class="mermaid-code hidden"><code>graph TD;
+    A[Inicio] --> B{Decisión};
+    B -- Sí --> C[Proceso A];
+    B -- No --> D[Proceso B];
+    C --> E[Fin];
+    D --> E;</code></pre>
+                        <div id="mermaid-container" class="mermaid"></div>
+                        <p>Este es un texto de ejemplo largo para asegurar que el scrollbar sea visible y funcional.</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Phasellus et lorem eu felis adipiscing mollis. Mauris fermentum dictum magna. Sed laoreet aliquam leo. Ut tellus dolor, dapibus eget, elementum vel, cursus eleifend, elit. Aenean auctor wisi et urna. Aliquam erat volutpat. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi. Morbi auctor lorem non justo. Nam lacus libero, pretium at, lobortis vitae, ultricies et, magna. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Sed non quam. In eu velit. Etiam vel elit vel elit vel elit. Proin interdum mollis sapien. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit.</p>
+                        <p>Este es un texto de ejemplo largo para asegurar que el scrollbar sea visible y funcional.</p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Phasellus et lorem eu felis adipiscing mollis. Mauris fermentum dictum magna. Sed laoreet aliquam leo. Ut tellus dolor, dapibus eget, elementum vel, cursus eleifend, elit. Aenean auctor wisi et urna. Aliquam erat volutpat. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi. Morbi auctor lorem non justo. Nam lacus libero, pretium at, lobortis vitae, ultricies et, magna. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.</p>
+                        <p>Sed non quam. In eu velit. Etiam vel elit vel elit vel elit. Proin interdum mollis sapien. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Inicializar Mermaid con configuración global
+        mermaid.initialize({
+            startOnLoad: false, // No iniciar automáticamente al cargar la página
+            theme: 'dark', // Tema oscuro para Mermaid
+            securityLevel: 'loose', // Necesario para algunos diagramas más complejos
+            flowchart: {
+                curve: 'basis'
+            },
+            sequence: {
+                showNumbers: true
+            },
+            gitGraph: {
+                showBranches: true,
+                showCommitLabel: true,
+                mainBranchName: 'main'
+            }
+        });
+
+        // Referencias a elementos del DOM
+        const editor = document.getElementById('editor');
+        const previewContainer = document.getElementById('preview-container'); // Contenedor principal de la vista previa
+        const previewContent = document.getElementById('preview-content'); // El div que realmente tiene el contenido
+        const fileInput = document.getElementById('fileInput');
+        const openFileBtn = document.getElementById('openFileBtn');
+        const appContainer = document.getElementById('app-container');
+        const loadingMessage = document.getElementById('loading-message');
+
+        // Mermaid siempre estará habilitado
+        const mermaidEnabled = true;
+
+        // Bandera para evitar bucles infinitos en la sincronización de scroll
+        let isUpdatingPreview = false; // Controla si la vista previa está siendo actualizada por el editor
+
+        // Configuración de Marked.js para resaltar código y manejar Mermaid
+        marked.setOptions({
+            gfm: true, // Habilitar GitHub Flavored Markdown
+            breaks: true, // Añadir <br> para saltos de línea simples
+            highlight: function(code, lang) {
+                // Si es un bloque de Mermaid, no lo resaltamos aquí, lo dejamos para Mermaid.js
+                if (lang && lang.toLowerCase() === 'mermaid') {
+                    return code;
+                }
+                // Para otros lenguajes, podrías usar un resaltador de sintaxis aquí
+                // Por simplicidad, Marked.js ya maneja el resaltado básico de bloques de código
+                return code;
+            }
+        });
+
+        // Función para actualizar la vista previa
+        async function updatePreview() {
+            const markdownText = editor.value;
+            // Convertir Markdown a HTML
+            let html = marked.parse(markdownText);
+
+            // Sanitizar el HTML para prevenir ataques XSS
+            html = DOMPurify.sanitize(html);
+
+            // Reemplazar bloques de código Mermaid con un contenedor para Mermaid
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const mermaidCodeBlocks = tempDiv.querySelectorAll('pre code.language-mermaid');
+
+            mermaidCodeBlocks.forEach((codeBlock) => {
+                const mermaidDiagramContainer = document.createElement('div');
+                mermaidDiagramContainer.className = 'mermaid'; // Clase que Mermaid.js busca
+                mermaidDiagramContainer.textContent = codeBlock.textContent; // El texto del diagrama
+                codeBlock.parentNode.replaceWith(mermaidDiagramContainer); // Reemplazar <pre> con el div de Mermaid
+            });
+
+            previewContent.innerHTML = tempDiv.innerHTML; // Actualizar el contenido del preview
+
+            // Resetear la posición del contenido al cargar nuevo contenido
+            previewContent.style.transform = `translateY(0px)`;
+
+            // Mostrar mensaje de carga
+            loadingMessage.style.display = 'block';
+            // Renderizar diagramas Mermaid después de que el HTML esté en el DOM
+            try {
+                await mermaid.run({
+                    querySelector: '#preview-content .mermaid', // Apunta al contenido real
+                    suppressErrors: true // Suprimir errores para no detener la ejecución
+                });
+            } catch (error) {
+                console.error("Error al renderizar Mermaid:", error);
+                // Opcional: mostrar un mensaje de error en el preview
+            } finally {
+                // Ocultar mensaje de carga
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        // Event listener para cambios en el editor (input)
+        editor.addEventListener('input', updatePreview);
+
+        // Event listener para scroll del editor
+        editor.addEventListener('scroll', () => {
+            // Calcular el porcentaje de scroll del editor
+            const scrollPercentage = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+            // Calcular el desplazamiento vertical para la vista previa
+            const maxTranslateY = previewContent.scrollHeight - previewContainer.clientHeight;
+            const newTranslateY = scrollPercentage * maxTranslateY;
+
+            // Aplicar el desplazamiento a la vista previa
+            previewContent.style.transform = `translateY(-${newTranslateY}px)`;
+        });
+
+        // Funcionalidad de arrastrar y soltar
+        appContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            appContainer.classList.add('drag-over');
+        });
+
+        appContainer.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            appContainer.classList.remove('drag-over');
+        });
+
+        appContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            appContainer.classList.remove('drag-over');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.name.endsWith('.md')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        editor.value = event.target.result;
+                        updatePreview();
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('Por favor, arrastra un archivo .md');
+                }
+            }
+        });
+
+        // Funcionalidad del botón "Abrir Archivo MD"
+        openFileBtn.addEventListener('click', () => {
+            fileInput.click(); // Simular clic en el input de tipo file
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.name.endsWith('.md')) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    editor.value = event.target.result;
+                    updatePreview();
+                };
+                reader.readAsText(file);
+            } else if (file) {
+                alert('Por favor, selecciona un archivo .md');
+            }
+        });
+
+        // Cargar el contenido inicial en el editor y la vista previa
+        document.addEventListener('DOMContentLoaded', () => {
+            // Obtener el contenido del bloque de ejemplo de Mermaid
+            const exampleMermaidCode = document.querySelector('.mermaid-code').textContent;
+            // Insertar un contenido inicial más largo para asegurar que los scrollbars aparezcan
+            editor.value = `# ¡Bienvenido al editor MD!
+
+Arrastra y suelta un archivo \`.md\` aquí, usa el botón "Abrir Archivo MD", o simplemente empieza a escribir en el editor de la izquierda.
+
+Este editor soporta la sintaxis básica de Markdown y también puede renderizar diagramas \`Mermaid\`.
+
+## Ejemplo de Código
+\`\`\`javascript
+function helloWorld() {
+    console.log("Hello, Cyberpunk World!");
+}
+helloWorld();
+\`\`\`
+
+## Ejemplo de Mermaid
+Aquí tienes un diagrama de Mermaid:
+\`\`\`mermaid
+${exampleMermaidCode}
+\`\`\`
+
+### Texto de Relleno para Scroll (Editor y Preview)
+Este es un texto de ejemplo largo para asegurar que el scrollbar sea visible y funcional. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.
+
+Phasellus et lorem eu felis adipiscing mollis. Mauris fermentum dictum magna. Sed laoreet aliquam leo. Ut tellus dolor, dapibus eget, elementum vel, cursus eleifend, elit. Aenean auctor wisi et urna. Aliquam erat volutpat. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.
+
+Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi. Morbi auctor lorem non justo. Nam lacus libero, pretium at, lobortis vitae, ultricies et, magna. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.
+
+Sed non quam. In eu velit. Etiam vel elit vel elit vel elit. Proin interdum mollis sapien. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit. Etiam vel elit. Proin interdum mollis sapien. Sed non quam. In eu velit.
+`;
+            updatePreview(); // Renderizar el contenido inicial
+        });
+    </script>
+</body>
+</html>
