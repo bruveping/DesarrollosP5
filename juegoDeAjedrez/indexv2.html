@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajedrez</title>
-    <link rel="icon" type="image/x-icon" href="favicon.png">
     <style>
         * {
             margin: 0;
@@ -354,46 +353,24 @@
             transition: all 0.3s ease;
         }
 
-        .clear-moves .btn-undo {
-            background: linear-gradient(45deg, #ffa726, #ff9800);
-        }
-
-        .clear-moves .btn-copy {
-            background: linear-gradient(45deg, #ab47bc, #9c27b0);
+        .clear-moves .btn-clear {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
         }
 
         .clear-moves .btn-download {
             background: linear-gradient(45deg, #4ecdc4, #44a08d);
         }
 
-        .clear-moves .btn-clear {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-        }
-
         .clear-moves button:hover {
             transform: translateY(-2px);
-        }
-
-        .clear-moves .btn-undo:hover {
-            box-shadow: 0 5px 15px rgba(255, 167, 38, 0.4);
-        }
-
-        .clear-moves .btn-copy:hover {
-            box-shadow: 0 5px 15px rgba(171, 71, 188, 0.4);
-        }
-
-        .clear-moves .btn-download:hover {
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
         }
 
         .clear-moves .btn-clear:hover {
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
 
-        .btn-disabled {
-            opacity: 0.5;
-            cursor: not-allowed !important;
-            transform: none !important;
+        .clear-moves .btn-download:hover {
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
         }
 
             @media (max-width: 640px) {
@@ -422,7 +399,7 @@
         <div class="game-container">
             <div class="game-header">
                 <h1>♔ Ajedrez ♛</h1>
-		<p>Este es un set para aprender a jugar, no tiene motor de juegos,<br> el usuario debe mover tanto las piezas blancas como las negras</p>
+		<p>Este es un set para aprender a jugar, no tiene motor de juegos, el usuario debe mover tanto las piezas blancas como las negras</p>
                 <div class="turn-indicator" id="turnIndicator">Turno: Blancas</div>
             </div>
             
@@ -438,9 +415,6 @@
             <div class="moves-header">
                 <h2 class="moves-title">📝 Historial</h2>
                 <div class="moves-counter" id="movesCounter">Movimientos: 0</div>
-		<div class="clear-moves">
-                <button class="btn-undo" id="undoBtn" onclick="undoLastMove()">↶ Deshacer (Ctrl+Z)</button>
-		</div>
             </div>
             <div class="moves-list" id="movesList">
                 <div style="text-align: center; color: #999; font-style: italic; margin-top: 50px;">
@@ -448,7 +422,6 @@
                 </div>
             </div>
             <div class="clear-moves">
-                <button class="btn-copy" onclick="copyHistoryToClipboard()">📋 Copiar Historial</button>
                 <button class="btn-download" onclick="downloadGameHistory()">📥 Descargar Historial</button>
                 <button class="btn-clear" onclick="clearMoveHistory()">🗑️ Limpiar Historial</button>
             </div>
@@ -496,7 +469,6 @@
         let pendingPromotion = null;
         let moveHistory = [];
         let moveNumber = 1;
-        let gameHistory = []; // Para almacenar estados completos del tablero
 
         function initializeBoard() {
             board = initialBoard.map(row => [...row]);
@@ -506,20 +478,14 @@
             pendingPromotion = null;
             moveHistory = [];
             moveNumber = 1;
-            gameHistory = [];
             castlingRights = {
                 white: { king: true, queenside: true, kingside: true },
                 black: { king: true, queenside: true, kingside: true }
             };
-            
-            // Guardar estado inicial
-            saveGameState();
-            
             hidePromotionModal();
             renderBoard();
             updateTurnIndicator();
             updateMovesDisplay();
-            updateUndoButton();
         }
 
         function renderBoard() {
@@ -616,13 +582,8 @@
             
             // Cambiar turno después de la promoción
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            
-            // Guardar estado después de la promoción
-            saveGameState();
-            
             renderBoard();
             updateTurnIndicator();
-            updateUndoButton();
         }
 
         function generateMoveNotation(fromRow, fromCol, toRow, toCol, piece) {
@@ -759,14 +720,9 @@
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
             selectedSquare = null;
             possibleMoves = [];
-            
-            // Guardar estado del juego después del movimiento
-            saveGameState();
-            
             renderBoard();
             updateTurnIndicator();
             updateMovesDisplay();
-            updateUndoButton();
         }
 
         function isPieceOfCurrentPlayer(piece) {
@@ -1133,117 +1089,6 @@ Descargado el ${dateStr} a las ${timeStr}`;
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         }
-
-        // Función para guardar el estado del juego
-        function saveGameState() {
-            const gameState = {
-                board: board.map(row => [...row]),
-                currentPlayer: currentPlayer,
-                castlingRights: JSON.parse(JSON.stringify(castlingRights)),
-                moveHistory: [...moveHistory]
-            };
-            gameHistory.push(gameState);
-        }
-
-        // Función para deshacer el último movimiento
-        function undoLastMove() {
-            if (gameHistory.length <= 1 || pendingPromotion) {
-                return; // No se puede deshacer si no hay movimientos o hay promoción pendiente
-            }
-
-            // Remover el estado actual
-            gameHistory.pop();
-            
-            // Remover el último movimiento del historial
-            if (moveHistory.length > 0) {
-                moveHistory.pop();
-            }
-
-            // Restaurar el estado anterior
-            const previousState = gameHistory[gameHistory.length - 1];
-            board = previousState.board.map(row => [...row]);
-            currentPlayer = previousState.currentPlayer;
-            castlingRights = JSON.parse(JSON.stringify(previousState.castlingRights));
-            
-            selectedSquare = null;
-            possibleMoves = [];
-            
-            renderBoard();
-            updateTurnIndicator();
-            updateMovesDisplay();
-            updateUndoButton();
-        }
-
-        // Función para actualizar el estado del botón deshacer
-        function updateUndoButton() {
-            const undoBtn = document.getElementById('undoBtn');
-            if (gameHistory.length <= 1 || pendingPromotion) {
-                undoBtn.classList.add('btn-disabled');
-                undoBtn.disabled = true;
-            } else {
-                undoBtn.classList.remove('btn-disabled');
-                undoBtn.disabled = false;
-            }
-        }
-
-        // Función para copiar historial al portapapeles
-        async function copyHistoryToClipboard() {
-            if (moveHistory.length === 0) {
-                alert('¡No hay movimientos para copiar!');
-                return;
-            }
-
-            let textContent = 'HISTORIAL DE MOVIMIENTOS:\n';
-            textContent += '========================\n';
-
-            // Generar los movimientos en formato texto
-            for (let i = 0; i < moveHistory.length; i += 2) {
-                const moveNum = Math.floor(i / 2) + 1;
-                const whiteMove = moveHistory[i];
-                const blackMove = moveHistory[i + 1];
-                
-                let line = `${moveNum}.`;
-                line += ` ${whiteMove?.notation || ''}`;
-                if (blackMove) {
-                    line += ` ${blackMove.notation}`;
-                }
-                
-                textContent += line + '\n';
-            }
-
-            try {
-                await navigator.clipboard.writeText(textContent);
-                
-                // Feedback visual
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = '✅ ¡Copiado!';
-                btn.style.background = 'linear-gradient(45deg, #4caf50, #45a049)';
-                
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = 'linear-gradient(45deg, #ab47bc, #9c27b0)';
-                }, 2000);
-                
-            } catch (err) {
-                // Fallback para navegadores que no soportan clipboard API
-                const textArea = document.createElement('textarea');
-                textArea.value = textContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('¡Historial copiado al portapapeles!');
-            }
-        }
-
-        // Event listener para Ctrl+Z
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault();
-                undoLastMove();
-            }
-        });
     </script>
 </body>
 </html>
