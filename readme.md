@@ -100,5 +100,7 @@ Muestrario de trabajos 3 https://bruveping.github.io/DesarrollosP5/treeJs_2025_5
 [Un editor de Markdown](https://bruveping.github.io/DesarrollosP5/Markdown_editor_html)
 
 juegoDeAjedrez [Un juego de ajedrez](https://bruveping.github.io/DesarrollosP5/juegoDeAjedrez)
+juegoDeAjedrez 2 [Un juego de ajedrez II](https://bruveping.github.io/DesarrollosP5/juegoDeAjedrez_celular)
+
 
 
