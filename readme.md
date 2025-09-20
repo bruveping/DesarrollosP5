@@ -95,6 +95,8 @@ Editor tipo ACE para celular https://bruveping.github.io/DesarrollosP5/Editor_Ac
 
 herramienta_para_componer_canciones 🎵   https://bruveping.github.io/DesarrollosP5/herramienta_para_componer_canciones/
 
+[Hacer poemas con métrica](https://bruveping.github.io/DesarrollosP5/contarPalabras/)
+
 Muestrario de trabajos 3 https://bruveping.github.io/DesarrollosP5/treeJs_2025_5_29
 
 [Un editor de Markdown](https://bruveping.github.io/DesarrollosP5/Markdown_editor_html)
