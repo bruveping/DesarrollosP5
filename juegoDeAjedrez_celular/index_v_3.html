@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -175,13 +174,7 @@
         .white { color: #fff; }
         .black { color: #333; }
 
-        .reset-btn { 
-		margin-top: 30px;
-            /* text-align: center; */ /* Reemplazado por flex */
-            display: flex;
-            justify-content: center;
-            gap: 15px; /* Espacio entre los botones */
-	}
+        .reset-btn { margin-top: 30px; text-align: center; }
 
         .reset-btn button {
             background: linear-gradient(45deg, #667eea, #764ba2);
@@ -276,40 +269,6 @@
             .board-wrapper { max-width: 350px; }
             .chessboard { max-width: 350px; }
         }
-/* --- ESTILOS CORREGIDOS PARA VOLTEAR --- */
-
-        /* Estilo para el nuevo botón de voltear */
-        #flipBtn {
-            background: linear-gradient(45deg, #02aab0, #00cdac);
-        }
-
-        #flipBtn:hover {
-            box-shadow: 0 8px 25px rgba(2, 170, 176, 0.3);
-        }
-
-        /* Clase que se añade al CONTENEDOR (.board-wrapper) para girarlo */
-        .board-wrapper.board-flipped {
-            transform: rotate(180deg);
-            transition: transform 0.5s ease-in-out;
-        }
-
-        /* Contra-rotación para las PIEZAS */
-        .board-wrapper.board-flipped .piece {
-            transform: translate(-50%, -50%) rotate(180deg);
-        }
-        
-        /* Contra-rotación para el HOVER de las piezas */
-        .board-wrapper.board-flipped .piece:hover {
-            transform: translate(-50%, -50%) scale(1.1) rotate(180deg);
-        }
-
-        /* ¡NUEVO! Contra-rotación para las COORDENADAS */
-        .board-wrapper.board-flipped .rank-labels,
-        .board-wrapper.board-flipped .file-labels {
-            transform: rotate(180deg);
-            transition: transform 0.5s ease-in-out;
-        }
-        /* --- FIN DE ESTILOS CORREGIDOS --- */
     </style>
 </head>
 <body>
@@ -329,7 +288,6 @@
             
             <div class="reset-btn">
                 <button onclick="initializeBoard()">Nueva Partida</button>
-		<button onclick="flipBoard()" id="flipBtn">Voltear Tablero (⟳)</button>
             </div>
         </div>
 
@@ -393,16 +351,6 @@
         let moveHistory = [];
         let moveNumber = 1;
         let gameHistory = [];
-
-/* --- FUNCIÓN AÑADIDA PARA VOLTEAR --- */
-        function flipBoard() {
-            // Apuntamos al nuevo contenedor que tiene el tablero Y las coordenadas
-            const boardWrapper = document.querySelector('.board-wrapper');
-            if (boardWrapper) {
-                // Usaremos una clase en el 'wrapper'
-                boardWrapper.classList.toggle('board-flipped');
-            }
-        }
 
         function initializeBoard() {
             board = initialBoard.map(row => [...row]);
