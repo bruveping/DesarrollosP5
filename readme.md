@@ -105,5 +105,7 @@ juegoDeAjedrez [Un juego de ajedrez](https://bruveping.github.io/DesarrollosP5/j
 
 juegoDeAjedrez 2 [Un juego de ajedrez II](https://bruveping.github.io/DesarrollosP5/juegoDeAjedrez_celular)
 
+Juego de ajedrez 3 [juegoDeAjedrezPGN III](https://bruveping.github.io/DesarrollosP5/juegoDeAjedrezPGN)
+
 
 
