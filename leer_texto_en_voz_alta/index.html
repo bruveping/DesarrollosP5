@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leer texto en voz alta</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-color: #2c2c2c;
+            --text-color: #f0f0f0;
+            --placeholder-color: #6a6a6a;
+            --primary-color: #007aff;
+            --primary-hover: #0056b3;
+            --secondary-color: #4a4a4a;
+            --secondary-hover: #5a5a5a;
+            --disabled-color: #3f3f3f;
+            --highlight-bg: #007aff;
+            --highlight-text: #ffffff;
+            --loop-inactive: #6a6a6a;
+            --loop-active: #ff3b30; /* Rojo */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .layout-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .controls-panel {
+            flex: 0 0 320px;
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            border: 1px solid #3a3a3a;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .text-content {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .controls-panel h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            max-height: 300px;
+            padding: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+        }
+
+        #load-text-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 12px 18px;
+        }
+        #load-text-btn:hover { background-color: var(--primary-hover); }
+
+        .controls-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        #voice-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9rem;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23f0f0f0%22%3E%3Cpath%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .navigation-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        #chunk-counter {
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .playback-controls { 
+            display: flex; 
+            gap: 12px; 
+            grid-column: 1 / -1; /* Ocupa todo el ancho en la grilla */
+        }
+        
+        .controls-grid button, #load-text-btn {
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .controls-grid button:not(:disabled):active, #load-text-btn:active { transform: scale(0.98); }
+        .controls-grid button:disabled { background-color: var(--disabled-color); color: #777; cursor: not-allowed; transform: none; }
+
+        #prev-btn, #next-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            width: 50px;
+            font-size: 1.2rem;
+            padding: 12px;
+        }
+        #prev-btn:not(:disabled):hover, #next-btn:not(:disabled):hover { background-color: var(--secondary-hover); }
+
+        #play-btn { flex-grow: 2; background-color: var(--primary-color); color: white; padding: 12px 18px; }
+        #play-btn:not(:disabled):hover { background-color: var(--primary-hover); }
+
+        #pause-btn, #stop-btn { flex-grow: 1; background-color: var(--secondary-color); color: var(--text-color); padding: 12px 18px; }
+        #pause-btn:not(:disabled):hover, #stop-btn:not(:disabled):hover { background-color: var(--secondary-hover); }
+        
+        /* NUEVO: Estilos del botón de Bucle */
+        #loop-toggle-btn {
+            background-color: var(--loop-inactive);
+            color: white;
+            padding: 12px 18px;
+            font-size: 1.2rem;
+            line-height: 1; /* Para centrar el icono */
+        }
+        #loop-toggle-btn.active {
+            background-color: var(--loop-active);
+        }
+        #loop-toggle-btn:not(.active):hover {
+             background-color: #9a9a9a;
+        }
+
+        #text-to-read {
+            background-color: var(--card-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 25px;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        #text-to-read:empty:before {
+            content: "Carga un texto usando el panel de la izquierda para comenzar...";
+            color: var(--placeholder-color);
+            font-style: italic;
+        }
+
+        .word {
+            transition: background-color 0.1s linear, color 0.1s linear;
+            cursor: pointer;
+        }
+
+        .word:hover {
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        .highlight {
+            background-color: var(--highlight-bg) !important;
+            color: var(--highlight-text);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 900px) {
+            .layout-container {
+                flex-direction: column;
+            }
+            .controls-panel {
+                position: static;
+                width: 100%;
+                height: auto;
+                max-height: none;
+            }
+            #text-to-read {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        
+        <aside class="controls-panel">
+            <h1>Lector de Texto 🎙️</h1>
+        
+            <div class="input-section">
+                <textarea id="text-input" placeholder="Pega o escribe tu texto aquí..."></textarea>
+                <button id="load-text-btn">Cargar Texto</button>
+            </div>
+
+            <div class="controls-grid">
+                <select id="voice-select" title="Seleccionar voz"></select>
+                
+                <div class="navigation-controls">
+                    <button id="prev-btn" title="Anterior">⬅️</button>
+                    <span id="chunk-counter">0 / 0</span>
+                    <button id="next-btn" title="Siguiente">➡️</button>
+                    <button id="loop-toggle-btn" title="Activar/Desactivar Bucle">🔄</button>
+                </div>
+                
+                <div class="playback-controls">
+                    <button id="play-btn" title="Leer">▶️ Leer</button>
+                    <button id="pause-btn" title="Pausar">⏸️ Pausar</button>
+                    <button id="stop-btn" title="Detener">⏹️ Detener</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="text-content">
+            <div id="text-to-read" spellcheck="false"></div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!('speechSynthesis' in window)) {
+                alert("Lo siento, tu navegador no soporta la API de Texto a Voz.");
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            const textInput = document.getElementById('text-input');
+            const loadTextBtn = document.getElementById('load-text-btn');
+            const textToRead = document.getElementById('text-to-read');
+            const voiceSelect = document.getElementById('voice-select');
+            const playBtn = document.getElementById('play-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const chunkCounter = document.getElementById('chunk-counter');
+            const loopToggleBtn = document.getElementById('loop-toggle-btn');
+
+            let voices = [];
+            let utterance = new SpeechSynthesisUtterance();
+            let textChunks = []; // Array de trozos FIJOS (para navegación ← y →)
+            let currentChunkIndex = 0;
+            const CHUNK_TARGET_COUNT = 40;
+            let currentHighlightId = null; 
+            let allWordSpans = []; 
+            
+            // Banderas de estado
+            let autoAdvance = true; // Controla si onend debe avanzar
+            let isReadingSubChunk = false; // True si la lectura fue iniciada por un clic
+            let globalWordStartOffset = 0; // Índice global de la palabra donde empezó la lectura (usado por onboundary)
+            let isLoopActive = false; // Bucle activo/inactivo
+
+            // --- 1. Carga de Voces ---
+            function populateVoiceList() {
+                voices = synth.getVoices();
+                voiceSelect.innerHTML = ''; 
+                const spanishVoices = voices.filter(voice => voice.lang.startsWith('es'));
+                const otherVoices = voices.filter(voice => !voice.lang.startsWith('es'));
+
+                [...spanishVoices, ...otherVoices].forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.setAttribute('data-lang', voice.lang);
+                    option.setAttribute('data-name', voice.name);
+                    voiceSelect.appendChild(option);
+                });
+                if (spanishVoices.length > 0) voiceSelect.selectedIndex = 0;
+                updateNavigationButtons();
+            }
+            
+            // Corrección 1: Inicialización robusta para esperar a que las voces carguen
+            if (synth.getVoices().length === 0) {
+                synth.onvoiceschanged = populateVoiceList;
+            } else {
+                populateVoiceList();
+            }
+
+            // --- 2. Lógica de "Cargar" y Chunking FIJO ---
+            loadTextBtn.addEventListener('click', () => {
+                const text = textInput.value;
+                if (text.trim() === "") {
+                    // Usamos alert temporalmente, pero una solución UI sería mejor.
+                    console.error("El campo de texto está vacío.");
+                    return; 
+                }
+                autoAdvance = false; 
+                stopSpeech(); 
+                
+                let html = '';
+                let wordIndex = 0;
+                const lines = text.split('\n');
+                
+                lines.forEach((line, lineIndex) => {
+                    // Patrón mejorado para dividir por palabra y mantener el espacio como parte del divisor
+                    const parts = line.split(/(\s+)/); 
+                    parts.forEach(part => {
+                        if (part.trim().length > 0) {
+                            // Añadimos data-chunk-index, aunque se calcule en el siguiente paso
+                            html += `<span class="word" data-word-index="${wordIndex}" id="word-${wordIndex}">${part}</span>`;
+                            wordIndex++;
+                        } else {
+                            html += part;
+                        }
+                    });
+                    if (lineIndex < lines.length - 1) html += '<br>';
+                });
+                
+                textToRead.innerHTML = html;
+                allWordSpans = textToRead.querySelectorAll('.word');
+                
+                // Generar los chunks FIJOS (siempre desde el índice 0)
+                generateFixedChunks(); 
+            });
+
+            // Función para generar la estructura de chunks fijos (solo se llama al cargar)
+            function generateFixedChunks() {
+                const totalWords = allWordSpans.length;
+                if (totalWords === 0) {
+                    textChunks = [];
+                    currentChunkIndex = 0;
+                    updateNavigationButtons();
+                    return;
+                }
+
+                const wordsPerChunk = CHUNK_TARGET_COUNT;
+                textChunks = [];
+                
+                for (let i = 0; i < totalWords; i += wordsPerChunk) {
+                    let chunkWordIds = [];
+                    let chunkText = '';
+                    
+                    for (let j = i; j < i + wordsPerChunk && j < totalWords; j++) {
+                        const wordSpan = allWordSpans[j];
+                        chunkWordIds.push(wordSpan.id);
+                        chunkText += wordSpan.textContent + ' ';
+                        
+                        // Añadir el índice de chunk a la palabra para la navegación con el mouse
+                        wordSpan.setAttribute('data-chunk-index', textChunks.length);
+                    }
+                    
+                    if (chunkWordIds.length > 0) {
+                         textChunks.push({
+                            text: chunkText.trim(),
+                            wordIds: chunkWordIds
+                        });
+                    }
+                }
+                
+                currentChunkIndex = 0;
+                updateNavigationButtons();
+            }
+
+
+            function updateNavigationButtons() {
+                const totalChunks = textChunks.length;
+                chunkCounter.textContent = `${totalChunks > 0 ? currentChunkIndex + 1 : 0} / ${totalChunks}`;
+                prevBtn.disabled = (currentChunkIndex === 0 || totalChunks === 0);
+                nextBtn.disabled = (currentChunkIndex === totalChunks - 1 || totalChunks === 0);
+                playBtn.disabled = (totalChunks === 0 || voices.length === 0); // Deshabilitar si no hay texto O si no hay voces
+            }
+
+            // --- 3. Lógica de Reproducción Central ---
+
+            function playSpeech() {
+                autoAdvance = true; 
+                removeHighlight(); 
+
+                if (synth.speaking && synth.paused) {
+                    synth.resume();
+                    pauseBtn.textContent = '⏸️ Pausar';
+                    return;
+                }
+
+                if (synth.speaking) {
+                    autoAdvance = false; 
+                    synth.cancel();
+                    autoAdvance = true; 
+                }
+                
+                if (textChunks.length === 0) return;
+
+                const chunk = textChunks[currentChunkIndex];
+                if (!chunk) return; 
+
+                // Si no es un sub-chunk, usar el texto completo del chunk
+                if (!isReadingSubChunk) {
+                    utterance.text = chunk.text;
+                    globalWordStartOffset = parseInt(chunk.wordIds[0].replace('word-', ''));
+                }
+                // Si es un sub-chunk, el texto ya fue establecido por el click handler
+                
+                scrollToCurrentChunk();
+                
+                // Corrección 2: Verificar si hay una opción seleccionada antes de acceder a sus atributos
+                const selectedOptionElement = voiceSelect.selectedOptions[0];
+                if (!selectedOptionElement) {
+                    console.error("Error: No se encontró una voz seleccionada. Asegúrate de que las voces han cargado.");
+                    return; 
+                }
+                
+                const selectedOption = selectedOptionElement.getAttribute('data-name');
+                utterance.voice = voices.find(voice => voice.name === selectedOption);
+                
+                synth.speak(utterance);
+                pauseBtn.textContent = '⏸️ Pausar';
+                updateNavigationButtons();
+            }
+
+            // --- 4. Controles Estándar ---
+            
+            function pauseSpeech() {
+                if (synth.speaking) {
+                    if (synth.paused) {
+                        synth.resume();
+                        pauseBtn.textContent = '⏸️ Reanudar';
+                    } else {
+                        synth.pause();
+                        pauseBtn.textContent = '▶️ Reanudar';
+                    }
+                }
+            }
+
+            function stopSpeech() {
+                autoAdvance = false; 
+                synth.cancel();
+                removeHighlight();
+                currentChunkIndex = 0;
+                isReadingSubChunk = false;
+                globalWordStartOffset = 0;
+                pauseBtn.textContent = '⏸️ Pausar'; 
+                updateNavigationButtons();
+            }
+            
+            function toggleLoop() {
+                isLoopActive = !isLoopActive;
+                loopToggleBtn.classList.toggle('active', isLoopActive);
+            }
+
+            // --- 5. Navegación Manual (← y →) ---
+            
+            function scrollToCurrentChunk() {
+                if (textChunks.length === 0) return;
+                const firstWordId = textChunks[currentChunkIndex].wordIds[0];
+                const firstWordSpan = document.getElementById(firstWordId);
+                
+                if (firstWordSpan) {
+                    firstWordSpan.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }
+            }
+
+            prevBtn.addEventListener('click', () => {
+                autoAdvance = false; 
+                isReadingSubChunk = false; // Vuelve a la lógica estándar
+                if (currentChunkIndex > 0) {
+                    currentChunkIndex--;
+                    playSpeech(); 
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                autoAdvance = false; 
+                isReadingSubChunk = false; // Vuelve a la lógica estándar
+                if (currentChunkIndex < textChunks.length - 1) {
+                    currentChunkIndex++;
+                    playSpeech(); 
+                } else if (currentChunkIndex === textChunks.length - 1 && textChunks.length > 0) {
+                    stopSpeech();
+                }
+            });
+            
+            // --- 6. Clic para Navegar (Lógica Sub-Chunk) ---
+            textToRead.addEventListener('click', (event) => {
+                const clickedSpan = event.target.closest('.word');
+                if (!clickedSpan) return; 
+
+                const startWordIndex = parseInt(clickedSpan.getAttribute('data-word-index'));
+                const originalChunkIndex = parseInt(clickedSpan.getAttribute('data-chunk-index'));
+                
+                if (isNaN(startWordIndex) || isNaN(originalChunkIndex)) return;
+
+                // 1. Obtener los límites del chunk original
+                const originalChunk = textChunks[originalChunkIndex];
+                const originalWordIds = originalChunk.wordIds;
+                
+                // 2. Determinar dónde empieza la lectura (Sub-Chunk)
+                const startId = `word-${startWordIndex}`;
+                const wordSubIndex = originalWordIds.indexOf(startId);
+                
+                if (wordSubIndex === -1) return; // Error de sincronización
+
+                // 3. Construir el nuevo texto (Truncado)
+                let truncatedText = '';
+                for (let i = wordSubIndex; i < originalWordIds.length; i++) {
+                    const wordElement = document.getElementById(originalWordIds[i]);
+                    if (wordElement) {
+                        truncatedText += wordElement.textContent + ' ';
+                    }
+                }
+                
+                // 4. Configurar el estado y el Utterance
+                currentChunkIndex = originalChunkIndex;
+                isReadingSubChunk = true; // Activar lógica sub-chunk
+                globalWordStartOffset = startWordIndex; // La palabra inicial global
+                utterance.text = truncatedText.trim(); // Establecer el texto truncado
+                
+                playSpeech();
+            });
+
+            // --- 7. Lógica de Resaltado ---
+            
+            function highlightWord(charIndex) {
+                const chunk = textChunks[currentChunkIndex];
+                if (!chunk) return; 
+                
+                // Calcular la posición global de la palabra que se está leyendo:
+                // globalWordIndex = globalWordStartOffset + palabra_leída_en_el_chunk_actual
+                
+                let wordIndexInSpokenText = 0;
+                let charCount = 0;
+                
+                // Determinar el índice de la palabra en el texto que SE ESTÁ HABLANDO (utterance.text)
+                const spokenText = utterance.text;
+                // Usamos el mismo patrón de división que al cargar el texto para la consistencia
+                const spokenWords = spokenText.split(/(\s+)/).filter(w => w.trim().length > 0);
+                
+                for (let i = 0; i < spokenWords.length; i++) {
+                    if (charIndex >= charCount && charIndex < charCount + spokenWords[i].length) {
+                        wordIndexInSpokenText = i;
+                        break;
+                    }
+                    // Sumamos la longitud de la palabra + el espacio (1) para la próxima posición de inicio
+                    charCount += spokenWords[i].length + 1;
+                }
+                
+                // Mapear este índice relativo al índice global
+                const globalWordIndex = globalWordStartOffset + wordIndexInSpokenText;
+                const wordIdToHighlight = `word-${globalWordIndex}`;
+                
+                if (wordIdToHighlight && wordIdToHighlight !== currentHighlightId) {
+                    removeHighlight();
+                    const spanToHighlight = document.getElementById(wordIdToHighlight);
+                    if (spanToHighlight) {
+                        spanToHighlight.classList.add('highlight');
+                        currentHighlightId = wordIdToHighlight;
+                    }
+                }
+            }
+
+            function removeHighlight() {
+                if (currentHighlightId) {
+                    const highlighted = document.getElementById(currentHighlightId);
+                    if (highlighted) {
+                        highlighted.classList.remove('highlight');
+                    }
+                    currentHighlightId = null;
+                }
+            }
+            
+            // --- 8. Eventos de la API de Voz (Con Lógica de Bucle y Sub-Chunk) ---
+
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    highlightWord(event.charIndex);
+                }
+            };
+            
+            utterance.onend = () => {
+                if (!autoAdvance) {
+                    autoAdvance = true; 
+                    return; 
+                }
+                
+                removeHighlight(); 
+                
+                if (isReadingSubChunk) {
+                    // Si terminó el sub-chunk, pasar al siguiente chunk completo
+                    isReadingSubChunk = false; // Desactivar lógica sub-chunk
+                    currentChunkIndex++;
+                    // Ahora la lógica estándar de playSpeech usará el chunk[currentChunkIndex] completo
+                } else {
+                    // Si terminó un chunk completo (o el sub-chunk se auto-avanzó)
+                    currentChunkIndex++;
+                }
+                
+                // Manejo de fin de texto (Bucle o Parada)
+                if (currentChunkIndex < textChunks.length) {
+                    playSpeech(); 
+                } else if (isLoopActive) {
+                    // Bucle: reiniciar al principio
+                    currentChunkIndex = 0;
+                    playSpeech();
+                } else {
+                    // Parada normal
+                    stopSpeech(); 
+                }
+            };
+            
+            utterance.onerror = (event) => {
+                if (event.error === 'canceled' || event.error === 'interrupted') {
+                    return;
+                }
+                console.error('Error en SpeechSynthesisUtterance:', event.error);
+                stopSpeech(); 
+            };
+            
+            // Asignar eventos
+            loopToggleBtn.addEventListener('click', toggleLoop);
+            playBtn.addEventListener('click', playSpeech);
+            pauseBtn.addEventListener('click', pauseSpeech);
+            stopBtn.addEventListener('click', stopSpeech);
+
+            // Se llama a populateVoiceList() condicionalmente arriba.
+            updateNavigationButtons(); 
+        });
+    </script>
+
+</body>
+</html>
