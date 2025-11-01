@@ -107,5 +107,8 @@ juegoDeAjedrez 2 [Un juego de ajedrez II](https://bruveping.github.io/Desarrollo
 
 Juego de ajedrez 3 [juegoDeAjedrezPGN III](https://bruveping.github.io/DesarrollosP5/juegoDeAjedrezPGN)
 
+Leer texto en voz alta [Lee en voz alta](https://bruveping.github.io/DesarrollosP5
+/leer_texto_en_voz_alta/)
+
 
 
