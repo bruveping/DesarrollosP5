@@ -48,12 +48,11 @@
             background-color: var(--cyber-bg-medium);
             border: 2px solid var(--cyber-neon-pink);
             box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
-            overflow-y: hidden; /* Cambia dinámicamente vía JS */
+            overflow-y: hidden;
             position: relative;
             border-radius: 8px;
         }
 
-        /* Cuando está maximizado, habilitamos scroll normal */
         #preview-container.maximized {
             overflow-y: auto !important;
         }
@@ -67,13 +66,11 @@
             transition: transform 0.1s ease-out;
         }
 
-        /* Ajuste de posición para scroll nativo cuando maximizamos */
         #preview-container.maximized #preview-content {
             position: relative;
             transform: none !important;
         }
 
-        /* Markdown Básico */
         #preview-content h1, #preview-content h2, #preview-content h3 {
             color: var(--cyber-neon-blue);
             border-bottom: 1px dashed var(--cyber-neon-pink);
@@ -100,7 +97,6 @@
             margin: 1rem 0;
         }
 
-        /* Estilos de Tabla */
         #preview-content table {
             width: 100%;
             border-collapse: collapse;
@@ -163,7 +159,6 @@
             pointer-events: none;
         }
 
-        /* Scrollbar personalizada */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--cyber-bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--cyber-neon-blue); border-radius: 4px; }
@@ -173,11 +168,11 @@
 <body class="flex flex-col p-4">
 
     <div id="loading-overlay">
-        <div class="mb-2">OPTIMIZANDO NAVEGACIÓN...</div>
+        <div class="mb-2">SINCRONIZANDO PROTOCOLO DE EXPORTACIÓN...</div>
     </div>
 
     <header class="flex justify-between items-center mb-4 px-2">
-        <h1 class="text-xl font-bold cyber-neon-blue tracking-widest uppercase">Cyber-Ace Protocol v2.7</h1>
+        <h1 class="text-xl font-bold cyber-neon-blue tracking-widest uppercase">Cyber-Ace Protocol v0.02.9</h1>
         <div class="flex gap-4">
             <button id="toggleEditorBtn" class="cyber-button">MAXIMIZAR VISTA</button>
             <button id="downloadBtn" class="cyber-button">EXPORTAR .MD</button>
@@ -258,9 +253,8 @@
                 }
             }
 
-            // Scroll sincronizado mejorado
             editor.session.on('changeScrollTop', () => {
-                if (isMaximized) return; // No sincronizar si está maximizado
+                if (isMaximized) return;
 
                 const scrollTop = editor.session.getScrollTop();
                 const screenHeight = editor.renderer.$size.scrollerHeight;
@@ -289,18 +283,33 @@
                     previewWrapper.classList.replace('w-full', 'w-1/2');
                     previewContainer.classList.remove('maximized');
                     toggleBtn.textContent = "MAXIMIZAR VISTA";
-                    // Forzar recalculo de scroll sincrónico al volver
                     editor.renderer.scrollCursorIntoView();
                 }
                 editor.resize();
             };
 
             document.getElementById('downloadBtn').onclick = () => {
-                const blob = new Blob([editor.getValue()], {type: 'text/markdown'});
+                const content = editor.getValue();
+                
+                // Lógica lógica: extrae el primer H1 para nombrar el archivo
+                const titleMatch = content.match(/^#\s+(.+)$/m);
+                let fileName = "cyber_archive";
+
+                if (titleMatch && titleMatch[1]) {
+                    fileName = titleMatch[1]
+                        .trim()
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
+                        .replace(/[^a-z0-9\s-_]/g, '')    // Quitar especiales
+                        .replace(/\s+/g, '_');           // Espacios a guiones
+                }
+
+                const blob = new Blob([content], {type: 'text/markdown'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = "materia_vibrante.md";
+                a.download = `${fileName}.md`;
                 a.click();
                 setTimeout(() => URL.revokeObjectURL(url), 100);
             };
