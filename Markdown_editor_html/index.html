@@ -314,10 +314,12 @@
                 setTimeout(() => URL.revokeObjectURL(url), 100);
             };
 
-            const initialValue = `# VISTA NAVEGABLE ACTIVADA
+            const initialValue = `# Editor Amigable de Markdown
 
 ## Instrucciones
 Al pulsar **MAXIMIZAR VISTA**, ahora puedes usar el scroll de tu ratón o teclado para leer todo el documento de forma fluida.
+
+El nombre del archivo exportado se adaptará automáticamente al primer título que escribas abajo.
 
 | Función | Estado |
 | :--- | :--- |
@@ -394,4 +396,5 @@ ${Array(20).fill("Contenido de relleno para probar el scroll...").join("\n\n")}`
     </script>
 </body>
 </html>
+
 
