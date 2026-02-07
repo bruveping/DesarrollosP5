@@ -3,483 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor MD Ciberpunk</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Cyber-Ace MD Editor</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter para texto general, Fira Code para código -->
+    <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Marked.js para convertir Markdown a HTML -->
+    
+    <!-- Dependencias -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- DOMPurify para sanitizar el HTML generado -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.6/dist/purify.min.js"></script>
-    <!-- Mermaid.js para diagramas -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+    
+    <!-- Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ext-language_tools.js"></script>
 
     <style>
-        /* Definición de colores ciberpunk personalizados para Tailwind */
         :root {
-            --cyber-bg-dark: #1a0a2a; /* Fondo oscuro, casi negro con un toque púrpura */
-            --cyber-bg-medium: #2a0a3a; /* Fondo un poco más claro */
-            --cyber-neon-green: #00ff00; /* Verde neón brillante */
-            --cyber-neon-blue: #00ffff; /* Azul cian neón */
-            --cyber-neon-pink: #ff00ff; /* Rosa fucsia neón */
-            --cyber-text-light: #e0e0e0; /* Texto claro */
-            --cyber-border-glow: rgba(0, 255, 255, 0.5); /* Resplandor para bordes */
-            --cyber-shadow-glow: rgba(0, 255, 255, 0.7); /* Resplandor para sombras */
+            --cyber-bg-dark: #1a0a2a;
+            --cyber-bg-medium: #2a0a3a;
+            --cyber-neon-green: #00ff00;
+            --cyber-neon-blue: #00ffff;
+            --cyber-neon-pink: #ff00ff;
+            --cyber-text-light: #e0e0e0;
         }
 
-        .cyber-bg-dark { background-color: var(--cyber-bg-dark); }
-        .cyber-bg-medium { background-color: var(--cyber-bg-medium); }
-        .cyber-neon-green { color: var(--cyber-neon-green); }
-        .cyber-neon-blue { color: var(--cyber-neon-blue); }
-        .cyber-neon-pink { color: var(--cyber-neon-pink); }
-        .cyber-text-light { color: var(--cyber-text-light); }
-        .border-cyber-neon-blue { border-color: var(--cyber-neon-blue); }
-
-        /* Estilos generales para el cuerpo */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--cyber-bg-dark);
             color: var(--cyber-text-light);
-            overflow: hidden; /* Evitar scroll de body */
+            overflow: hidden;
+            height: 100vh;
         }
 
-        /* Estilo para el editor de texto (textarea) */
         #editor {
-            font-family: 'Fira Code', monospace;
-            background-color: var(--cyber-bg-medium);
+            height: 100%;
+            width: 100%;
             border: 2px solid var(--cyber-neon-blue);
-            color: var(--cyber-neon-green);
-            box-shadow: 0 0 10px var(--cyber-shadow-glow);
-            resize: none;
-            outline: none;
-            caret-color: var(--cyber-neon-pink);
-            scrollbar-width: thin;
-            scrollbar-color: var(--cyber-neon-green) var(--cyber-bg-medium);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
         }
 
-        #editor::-webkit-scrollbar { width: 12px; }
-        #editor::-webkit-scrollbar-track { background: var(--cyber-bg-medium); border-radius: 6px; }
-        #editor::-webkit-scrollbar-thumb {
-            background-color: var(--cyber-neon-green);
-            border-radius: 6px;
-            border: 2px solid var(--cyber-bg-dark);
-            box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
-        }
-        #editor::-webkit-scrollbar-thumb:hover {
-            background-color: var(--cyber-neon-pink);
-            box-shadow: 0 0 12px var(--cyber-neon-pink);
-        }
-
-        /* Estilo para el contenedor de la vista previa */
         #preview-container {
             background-color: var(--cyber-bg-medium);
             border: 2px solid var(--cyber-neon-pink);
-            box-shadow: 0 0 10px var(--cyber-shadow-glow);
-            overflow: hidden;
-            position: relative; /* Necesario para posicionar preview-content */
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+            overflow-y: hidden; /* Cambia dinámicamente vía JS */
+            position: relative;
+            border-radius: 8px;
         }
 
-        /* Estilo para el contenido real de la vista previa */
+        /* Cuando está maximizado, habilitamos scroll normal */
+        #preview-container.maximized {
+            overflow-y: auto !important;
+        }
+
         #preview-content {
             position: absolute;
             width: 100%;
-            padding: 1.5rem;
+            padding: 2rem;
             top: 0;
             left: 0;
-            transition: transform 0.05s linear;
-        }
-        
-        /* Estilos para el slider vertical */
-        #preview-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            background: transparent;
-            cursor: pointer;
-            
-            /* La anchura se convierte en la altura efectiva debido a la rotación */
-            width: 80vh; 
-            max-width: 650px;
-	    min-width: 450px;
-            transform: rotate(90deg);
+            transition: transform 0.1s ease-out;
         }
 
-        #preview-slider::-webkit-slider-runnable-track {
-            height: 8px;
-            background: var(--cyber-neon-blue);
-            border-radius: 4px;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+        /* Ajuste de posición para scroll nativo cuando maximizamos */
+        #preview-container.maximized #preview-content {
+            position: relative;
+            transform: none !important;
         }
 
-        #preview-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            margin-top: -11px; /* Centra el thumb sobre el track */
-            height: 30px;
-            width: 15px;
-            border-radius: 5px;
-            background: var(--cyber-neon-pink);
-            border: 2px solid var(--cyber-bg-dark);
-            box-shadow: 0 0 12px var(--cyber-neon-pink);
-        }
-
-        /* Estilos para elementos Markdown dentro de la vista previa */
+        /* Markdown Básico */
         #preview-content h1, #preview-content h2, #preview-content h3 {
             color: var(--cyber-neon-blue);
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
             border-bottom: 1px dashed var(--cyber-neon-pink);
-            padding-bottom: 0.5rem;
-            margin-top: 1.5rem;
             margin-bottom: 1rem;
+            margin-top: 1.5rem;
+            font-weight: bold;
         }
-        #preview-content a {
-            color: var(--cyber-neon-green);
-            text-decoration: none;
-            border-bottom: 1px dotted var(--cyber-neon-green);
-        }
-        #preview-content a:hover {
-            color: var(--cyber-neon-pink);
-            border-bottom-color: var(--cyber-neon-pink);
-        }
+        #preview-content h1 { font-size: 1.75rem; }
+        #preview-content h2 { font-size: 1.5rem; }
+        
         #preview-content code {
-            background-color: rgba(0, 255, 0, 0.1);
+            background: rgba(0, 255, 0, 0.1);
             color: var(--cyber-neon-green);
-            padding: 0.2em 0.4em;
-            border-radius: 0.25rem;
+            padding: 2px 5px;
+            border-radius: 4px;
             font-family: 'Fira Code', monospace;
         }
-        #preview-content pre {
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--cyber-neon-blue);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.3);
-        }
-        #preview-content pre code { background: none; color: var(--cyber-neon-green); padding: 0; border-radius: 0; }
-        #preview-content blockquote {
-            border-left: 4px solid var(--cyber-neon-pink);
-            color: var(--cyber-text-light);
-            padding-left: 1rem;
-            margin: 1rem 0;
-            opacity: 0.8;
-        }
-        #preview-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-        #preview-content th, #preview-content td { border: 1px solid var(--cyber-neon-blue); padding: 0.5rem; text-align: left; }
-        #preview-content th { background-color: rgba(0, 255, 255, 0.1); color: var(--cyber-neon-blue); }
-        #preview-content ul, #preview-content ol { padding-left: 1.5rem; }
-        #preview-content li { margin-bottom: 0.5rem; }
 
-        /* Estilo para los botones */
+        #preview-content pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        /* Estilos de Tabla */
+        #preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border: 1px solid var(--cyber-neon-blue);
+        }
+
+        #preview-content th {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--cyber-neon-blue);
+            font-weight: bold;
+            text-align: left;
+            border: 1px solid var(--cyber-neon-blue);
+            padding: 0.75rem;
+        }
+
+        #preview-content td {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 0.75rem;
+            color: var(--cyber-text-light);
+        }
+
+        .mermaid {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
         .cyber-button {
             background-color: var(--cyber-neon-blue);
             color: var(--cyber-bg-dark);
             font-weight: bold;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 0 10px var(--cyber-shadow-glow);
-            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
             cursor: pointer;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            border: none;
         }
         .cyber-button:hover {
             background-color: var(--cyber-neon-pink);
             box-shadow: 0 0 15px var(--cyber-neon-pink);
-            transform: translateY(-2px);
-        }
-        .cyber-button:active { transform: translateY(0); box-shadow: 0 0 5px var(--cyber-neon-pink); }
-
-        /* Estilo para el contenedor de arrastrar y soltar */
-        .drag-over {
-            border: 4px dashed var(--cyber-neon-green) !important;
-            box-shadow: 0 0 20px var(--cyber-neon-green) !important;
         }
 
-        /* Estilo para el mensaje de carga */
-        #loading-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--cyber-bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
             color: var(--cyber-neon-green);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid var(--cyber-neon-blue);
-            box-shadow: 0 0 20px var(--cyber-shadow-glow);
-            z-index: 1000;
-            display: none; /* Oculto por defecto */
+            font-size: 1.2rem;
+            letter-spacing: 0.2rem;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--cyber-bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--cyber-neon-blue); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyber-neon-pink); }
     </style>
 </head>
-<body class="flex flex-col h-screen p-4 cyber-bg-dark text-cyber-text-light">
+<body class="flex flex-col p-4">
 
-    <!-- Mensaje de carga -->
-    <div id="loading-message" class="text-2xl font-bold">Cargando...</div>
-
-    <!-- Contenedor principal de la aplicación -->
-    <div id="app-container" class="flex flex-1 flex-col gap-4 rounded-lg overflow-hidden">
-
-        <!-- Controles superiores -->
-        <div class="flex justify-end gap-4 p-2 rounded-lg cyber-bg-medium max-w-[95%] mx-auto w-full">
-            <input type="file" id="fileInput" accept=".md" class="hidden">
-            <button id="openFileBtn" class="cyber-button">Abrir Archivo MD</button>
-            <button id="refreshPreviewBtn" class="cyber-button">Actualizar Vista Previa</button>
-            <button id="toggleEditorBtn" class="cyber-button">Ocultar Editor</button>
-            <button id="downloadMdBtn" class="cyber-button">Descargar MD</button>
-        </div>
-
-        <!-- Editor y Vista Previa -->
-        <div class="flex flex-1 gap-4 max-w-[95%] mx-auto w-full">
-            <!-- Editor de Markdown -->
-            <textarea id="editor" class="w-1/2 p-6 rounded-lg text-lg"></textarea>
-
-            <!-- ===== INICIO: ESTRUCTURA HTML CORREGIDA ===== -->
-            <div id="preview-wrapper" class="w-1/2 flex items-center gap-2">
-                <!-- Contenedor delgado para el Slider -->
-                <div id="slider-wrapper" class="hidden h-full w-10 flex justify-center items-center">
-                    <input type="range" id="preview-slider">
-                </div>
-                
-                <!-- Contenedor de Vista Previa (flex-1 para ocupar el espacio restante) -->
-                <div id="preview-container" class="h-full flex-1 rounded-lg">
-                    <div id="preview-content">
-                        <!-- El contenido Markdown renderizado aparecerá aquí -->
-                    </div>
-                </div>
-            </div>
-            <!-- ===== FIN: ESTRUCTURA HTML CORREGIDA ===== -->
-        </div>
+    <div id="loading-overlay">
+        <div class="mb-2">OPTIMIZANDO NAVEGACIÓN...</div>
     </div>
 
+    <header class="flex justify-between items-center mb-4 px-2">
+        <h1 class="text-xl font-bold cyber-neon-blue tracking-widest uppercase">Cyber-Ace Protocol v2.7</h1>
+        <div class="flex gap-4">
+            <button id="toggleEditorBtn" class="cyber-button">MAXIMIZAR VISTA</button>
+            <button id="downloadBtn" class="cyber-button">EXPORTAR .MD</button>
+        </div>
+    </header>
+
+    <main class="flex flex-1 gap-4 overflow-hidden">
+        <div id="editor-wrapper" class="w-1/2">
+            <div id="editor"></div>
+        </div>
+        <div id="preview-wrapper" class="w-1/2 flex flex-col">
+            <div id="preview-container" class="flex-1">
+                <div id="preview-content"></div>
+            </div>
+        </div>
+    </main>
+
     <script>
-        // Inicializar Mermaid
-        mermaid.initialize({
-            startOnLoad: false, theme: 'dark', securityLevel: 'loose',
-            flowchart: { curve: 'basis' },
-            sequence: { showNumbers: true },
-            gitGraph: { showBranches: true, showCommitLabel: true, mainBranchName: 'main' }
-        });
-
-        // Referencias a elementos del DOM
-        const editor = document.getElementById('editor');
-        const previewContainer = document.getElementById('preview-container');
-        const previewContent = document.getElementById('preview-content');
-        const fileInput = document.getElementById('fileInput');
-        const openFileBtn = document.getElementById('openFileBtn');
-        const refreshPreviewBtn = document.getElementById('refreshPreviewBtn');
-        const toggleEditorBtn = document.getElementById('toggleEditorBtn');
-        const downloadMdBtn = document.getElementById('downloadMdBtn');
-        const appContainer = document.getElementById('app-container');
-        const loadingMessage = document.getElementById('loading-message');
-        const previewSlider = document.getElementById('preview-slider');
-        const previewWrapper = document.getElementById('preview-wrapper');
-        const sliderWrapper = document.getElementById('slider-wrapper'); // Contenedor del slider
-
-        let fileCounter = 1;
-        let isEditorHidden = false;
-
-        // Configuración de Marked.js
-        marked.setOptions({
-            gfm: true, breaks: true,
-            highlight: (code, lang) => (lang && lang.toLowerCase() === 'mermaid') ? code : code
-        });
-
-        // Función para actualizar la vista previa
-        async function updatePreview() {
-            const markdownText = editor.value;
-            let html = marked.parse(markdownText);
-            html = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
-
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-
-            tempDiv.querySelectorAll('pre code.language-mermaid').forEach(codeBlock => {
-                const mermaidDiagramContainer = document.createElement('div');
-                mermaidDiagramContainer.className = 'mermaid';
-                mermaidDiagramContainer.textContent = codeBlock.textContent;
-                codeBlock.parentNode.replaceWith(mermaidDiagramContainer);
+        window.onload = function() {
+            mermaid.initialize({ 
+                startOnLoad: false, 
+                theme: 'dark', 
+                securityLevel: 'loose',
+                flowchart: { useMaxWidth: true, htmlLabels: true }
             });
 
-            previewContent.innerHTML = tempDiv.innerHTML;
-            previewContent.style.transform = `translateY(0px)`;
+            const editor = ace.edit("editor");
+            editor.setTheme("ace/theme/tomorrow_night_eighties");
+            editor.session.setMode("ace/mode/markdown");
+            
+            editor.setOptions({
+                fontSize: "16px",
+                fontFamily: "'Fira Code', monospace",
+                showPrintMargin: false,
+                useSoftTabs: true,
+                wrap: true,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
+            });
 
-            loadingMessage.style.display = 'block';
-            try {
-                await mermaid.run({ querySelector: '#preview-content .mermaid', suppressErrors: true });
-            } catch (error) {
-                console.error("Error al renderizar Mermaid:", error);
-            } finally {
-                loadingMessage.style.display = 'none';
+            const previewContent = document.getElementById('preview-content');
+            const previewContainer = document.getElementById('preview-container');
+            const editorWrapper = document.getElementById('editor-wrapper');
+            const previewWrapper = document.getElementById('preview-wrapper');
+            const toggleBtn = document.getElementById('toggleEditorBtn');
+
+            let mermaidTimeout;
+            let isMaximized = false;
+
+            async function updatePreview() {
+                const markdown = editor.getValue();
+                if (typeof marked !== 'undefined') {
+                    let html = marked.parse(markdown);
+                    html = DOMPurify.sanitize(html);
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+
+                    const codeBlocks = temp.querySelectorAll('pre code.language-mermaid');
+                    codeBlocks.forEach((block, index) => {
+                        const mDiv = document.createElement('div');
+                        mDiv.className = 'mermaid';
+                        mDiv.id = 'mermaid-graph-' + index;
+                        mDiv.textContent = block.textContent.replace(/\u00a0/g, ' '); 
+                        block.parentNode.replaceWith(mDiv);
+                    });
+
+                    previewContent.innerHTML = temp.innerHTML;
+
+                    clearTimeout(mermaidTimeout);
+                    mermaidTimeout = setTimeout(async () => {
+                        try {
+                            const graphs = document.querySelectorAll('.mermaid');
+                            if (graphs.length > 0) {
+                                await mermaid.run({ nodes: graphs });
+                            }
+                        } catch (e) {}
+                    }, 250);
+                }
             }
-        }
-        
-        // Sincroniza el scroll del preview con el del editor
-        function syncPreviewScroll() {
-            if (isEditorHidden) return;
-            const editorScrollHeight = editor.scrollHeight - editor.clientHeight;
-            if (editorScrollHeight <= 0) return;
-            const scrollPercentage = editor.scrollTop / editorScrollHeight;
-            const maxTranslateY = Math.max(0, previewContent.scrollHeight - previewContainer.clientHeight);
-            const newTranslateY = scrollPercentage * maxTranslateY;
-            previewContent.style.transform = `translateY(-${newTranslateY}px)`;
-        }
 
-        editor.addEventListener('scroll', syncPreviewScroll);
+            // Scroll sincronizado mejorado
+            editor.session.on('changeScrollTop', () => {
+                if (isMaximized) return; // No sincronizar si está maximizado
 
-        // Controla la posición del preview con el slider
-        previewSlider.addEventListener('input', () => {
-            if (!isEditorHidden) return;
-      
-	    const translateY = previewSlider.value;
-            previewContent.style.transform = `translateY(${translateY}px)`;
-        });
-
-        // ===== INICIO: LÓGICA DE BOTÓN CORREGIDA =====
-        toggleEditorBtn.addEventListener('click', () => {
-            isEditorHidden = !isEditorHidden;
-
-            if (isEditorHidden) {
-                editor.classList.add('hidden');
-                previewWrapper.classList.remove('w-1/2');
-                previewWrapper.classList.add('w-full');
-                toggleEditorBtn.textContent = 'Mostrar Editor';
-            } else {
-                editor.classList.remove('hidden');
-                previewWrapper.classList.remove('w-full');
-                previewWrapper.classList.add('w-1/2');
-                toggleEditorBtn.textContent = 'Ocultar Editor';
-            }
-
-            setTimeout(() => {
-                updatePreview().then(() => {
-                    if (isEditorHidden) {
-                        // Muestra el CONTENEDOR del slider
-                        sliderWrapper.classList.remove('hidden');
-                        sliderWrapper.classList.add('flex');
-                       /* 
-                        const maxScroll = Math.max(0, previewContent.scrollHeight - previewContainer.clientHeight);
-                        
-                    	previewSlider.max = previewHeight *30;
-                    	previewSlider.min = -previewHeight *30;
-                    	previewSlider.value = 0; // Valor por defecto*/
-			sliderWrapper.classList.remove('hidden');
-			sliderWrapper.classList.add('flex');
-
-			// Calcula la altura total desplazable del contenido
-			const scrollableHeight = previewContent.scrollHeight - previewContainer.clientHeight;
-			// Establece un multiplicador para un movimiento más amplio
-			const multiplier = 1; // Puedes ajustar este valor (3, 4, 5, etc.)
-
-			previewSlider.max = 0;
-			previewSlider.min = -scrollableHeight * multiplier;
-			previewSlider.value = 0; // Valor por defecto
-                        
-                        previewContent.style.transform = 'translateY(0px)';
-                    } else {
-                        // Oculta el CONTENEDOR del slider
-                        sliderWrapper.classList.add('hidden');
-                        sliderWrapper.classList.remove('flex');
-                        syncPreviewScroll();
-                    }
-                });
-            }, 50);
-        });
-        // ===== FIN: LÓGICA DE BOTÓN CORREGIDA =====
-        
-        editor.addEventListener('input', updatePreview);
-        refreshPreviewBtn.addEventListener('click', updatePreview);
-
-        // Funcionalidad de descarga
-        downloadMdBtn.addEventListener('click', () => {
-            const markdownContent = editor.value;
-            const defaultFilename = `archivo${String(fileCounter).padStart(3, '0')}.md`;
-            let filename = prompt('Introduce el nombre del archivo MD:', defaultFilename);
-            if (filename === null) return;
-            if (!filename.toLowerCase().endsWith('.md')) filename += '.md';
-            const blob = new Blob([markdownContent], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            fileCounter++;
-        });
-
-        // Funcionalidad de arrastrar y soltar
-        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-            appContainer.addEventListener(eventName, e => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (eventName === 'dragover') appContainer.classList.add('drag-over');
-                if (eventName === 'dragleave' || eventName === 'drop') appContainer.classList.remove('drag-over');
-                if (eventName === 'drop') {
-                    const file = e.dataTransfer.files[0];
-                    if (file && file.name.endsWith('.md')) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            editor.value = event.target.result;
-                            updatePreview();
-                        };
-                        reader.readAsText(file);
-                    } else {
-                        alert('Por favor, arrastra un archivo .md');
-                    }
+                const scrollTop = editor.session.getScrollTop();
+                const screenHeight = editor.renderer.$size.scrollerHeight;
+                const contentHeight = editor.session.getScreenLength() * editor.renderer.lineHeight;
+                const maxEditorScroll = contentHeight - screenHeight;
+                
+                if (maxEditorScroll > 0) {
+                    const scrollPercent = scrollTop / maxEditorScroll;
+                    const maxPreviewScroll = Math.max(0, previewContent.scrollHeight - previewContainer.clientHeight);
+                    previewContent.style.transform = `translateY(-${scrollPercent * maxPreviewScroll}px)`;
                 }
             });
-        });
 
-        // Funcionalidad de abrir archivo
-        openFileBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.name.endsWith('.md')) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    editor.value = event.target.result;
-                    updatePreview();
-                };
-                reader.readAsText(file);
-            } else if (file) {
-                alert('Por favor, selecciona un archivo .md');
-            }
-        });
+            editor.on('change', updatePreview);
 
-        // Cargar contenido inicial
-        document.addEventListener('DOMContentLoaded', () => {
-            editor.value = `# ¡Bienvenido al editor MD!
+            toggleBtn.onclick = () => {
+                isMaximized = !isMaximized;
+                
+                if (isMaximized) {
+                    editorWrapper.classList.add('hidden');
+                    previewWrapper.classList.replace('w-1/2', 'w-full');
+                    previewContainer.classList.add('maximized');
+                    toggleBtn.textContent = "MOSTRAR EDITOR";
+                } else {
+                    editorWrapper.classList.remove('hidden');
+                    previewWrapper.classList.replace('w-full', 'w-1/2');
+                    previewContainer.classList.remove('maximized');
+                    toggleBtn.textContent = "MAXIMIZAR VISTA";
+                    // Forzar recalculo de scroll sincrónico al volver
+                    editor.renderer.scrollCursorIntoView();
+                }
+                editor.resize();
+            };
 
-Arrastra y suelta un archivo \`.md\`, usa el botón "Abrir Archivo MD", o simplemente empieza a escribir.
+            document.getElementById('downloadBtn').onclick = () => {
+                const blob = new Blob([editor.getValue()], {type: 'text/markdown'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "materia_vibrante.md";
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            };
 
-## Ejemplo de Código
-\`\`\`javascript
-function helloWorld() {
-    console.log("Hello, Cyberpunk World!");
-}
-helloWorld();
-\`\`\`
+            const initialValue = `# VISTA NAVEGABLE ACTIVADA
 
-## Ejemplo de Mermaid
+## Instrucciones
+Al pulsar **MAXIMIZAR VISTA**, ahora puedes usar el scroll de tu ratón o teclado para leer todo el documento de forma fluida.
+
+| Función | Estado |
+| :--- | :--- |
+| Scroll Sincronizado | Solo en modo Split |
+| Navegación Manual | En modo Maximize |
+
+## Diagrama de Prueba (Largo)
 \`\`\`mermaid
 graph TD;
-    A[Inicio] --> B{Decisión};
-    B -- Sí --> C[Proceso A];
-    B -- No --> D[Proceso B];
-    C --> E[Fin];
-    D --> E;
+    subgraph Conceptos_Centrales
+        A((Materia Vibrante));
+        B(Vitalidad);
+        C(Agencia);
+    end
+
+    subgraph Fundamentos_y_Proyecto
+        D{Definicion};
+        E{Proyecto Politico};
+    end
+
+    subgraph Conceptos_Clave
+        F(Ensamblaje o Agenciamiento);
+        G(Causalidad Emergente);
+        H(Cuerpos Confederados);
+    end
+
+    A -- posee --> B;
+    B -- fundamenta la --> C;
+    
+    D -- es un --> D1[Principio Activo];
+    D -- es una --> D2[Materialidad Viva];
+    D -- no necesita --> D3[Intencionalidad o Divinidad];
+    
+    E -- busca --> E1[Interacciones Sustentables];
+    E -- busca --> E2[Cambiar Respuestas Politicas];
+
+    C -- se manifiesta como --> C1[Agencia Distributiva];
+    C1 -- es un --> C2[Enjambre de Vitalidades];
+    C1 -- se opone a --> C3[Agencia localizada en el sujeto];
+
+    F -- se compone de --> F1[Elementos Diversos];
+    F -- se caracteriza por --> F2[Propiedades Emergentes];
+    F -- se caracteriza por --> F3[Poder Irregular];
+    F -- se caracteriza por --> F4[Sin Cabeza Central];
+    F -- es un --> F5[Colectivo Abierto y Finito];
+    F2 -- genera la --> F2a[Agencia del Ensamblaje];
+
+    G -- es --> G1[Fractal y en Circuitos];
+    G -- se opone a --> G2[Causalidad Lineal y Eficiente];
+
+    H -- concepto de --> H1[Spinoza];
+    H -- explica como --> H2[Cuerpos se asocian];
+    H2 -- para --> H3[Incrementar su Potencia];
+
+    classDef central fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef clave fill:#ccf,stroke:#333,stroke-width:2px;
+    class A,B,C central;
+    class F,G,H clave;
+\`\`\`
+## Prueba de python
+\`\`\`python
+print("Hola mundo!")
 \`\`\`
 
-### Texto de Relleno para Scroll
-Este es un texto de ejemplo largo para asegurar que el scroll sea visible y funcional. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+${Array(20).fill("Contenido de relleno para probar el scroll...").join("\n\n")}`;
 
-Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus auctor iaculis. Mauris vel arcu. Aenean volutpat, sem id eleifend pulvinar, odio odio cursus purus, et egestas arcu felis sit amet lectus. In malesuada diam eget velit. Suspendisse vel mauris vel ipsum fermentum mollis. Morbi interdum mollis sapien. Sed ac quam. In eu velit.
-`;
+            editor.setValue(initialValue, -1);
             updatePreview();
-        });
+            
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        };
     </script>
 </body>
 </html>
